@@ -25,7 +25,7 @@ public class UPMSocialReadingSkeleton{
 	private String AdminPwd = "admin";
 	private ArrayList<String> users = new ArrayList<String>();
 	private HashMap<String, ArrayList<String>> friendList = new HashMap<String, ArrayList<String>>();
-	private HashMap<String, HashMap<String, Book>> bookList = new HashMap<String, HashMap<String, HashMap<String,Book>>>();
+	private HashMap<String,HashMap<String, Book>> bookList = new HashMap<String,HashMap<String,Book>>();
 	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
