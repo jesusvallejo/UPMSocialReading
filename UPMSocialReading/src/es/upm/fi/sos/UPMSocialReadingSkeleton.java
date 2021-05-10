@@ -11,16 +11,17 @@ package es.upm.fi.sos;
  */
 import java.rmi.RemoteException;
 import java.util.HashMap;
-
+import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.ChangePassword;
+import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.RemoveUser;
+import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Username;
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.*;
 import es.upm.fi.sos.xsd.*;
+
 import org.apache.axis2.AxisFault;
 public class UPMSocialReadingSkeleton{
 	private String AdminName = "admin";
 	private String AdminPwd = "admin";
-	private HashMap<String,Integer> loginList = new HashMap<String,Integer>();
-	private HashMap<String,> userFriends = new HashMap<String,String>();
-	private HashMap<String,Integer> userBooks = new HashMap<String,Integer>();
+	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
 	/**
@@ -154,12 +155,12 @@ public class UPMSocialReadingSkeleton{
 				System.out.println("Usuario Añadido");
 			}
 			returnParam.setPwd(rAddUser.get_return().getPassword());
-        	returnParam.setResponse(result);
+			returnParam.setResponse(result);
 			response.set_return(returnParam);
-			
+
 		}
 		else{ // solo el admin puede realizar esta tarea, devolver false
-			
+
 			returnParam.setResponse(false);
 			response.set_return(returnParam);
 
@@ -168,7 +169,7 @@ public class UPMSocialReadingSkeleton{
 
 
 
-		
+
 	}
 
 
@@ -185,7 +186,65 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#removeUser");
+		boolean result;
+		RemoveUserResponse response = new RemoveUserResponse();
+		Response returnParams = new Response();
+		String name = removeUser.getArgs0().getUsername();
+		Username param = new Username();
+		param.setName(name);
+		ExistUser _existUser = new ExistUser();
+		_existUser.setUsername(param);
+		if(user.getName().equals(AdminName)){
+			if(!name.equals(AdminName)){ // if ususario logeado es admin y no se va a leminar admin
+				try {
+					if(stub.existUser(_existUser).get_return().getResult()){
+						//if(name.equals("Cambiar esto")){ // habra que ver si es un usuario nuestro creo CAMBIAR!!
+							RemoveUser removeParam = new RemoveUser();
+							RemoveUserE _removeUser = new RemoveUserE();
+							RemoveUserResponseE rRemove= new RemoveUserResponseE();
+
+							removeParam.setName(name);
+							_removeUser.setRemoveUser(removeParam);
+							rRemove = stub.removeUser(_removeUser);
+							result =rRemove.get_return().getResult();
+							returnParams .setResponse(result);
+							if(result){
+								// eliminar libros y amigos de las listas
+								System.out.println("Usuario Eliminado");
+							}
+							response.set_return(returnParams);
+
+
+						//}
+						//else{
+						//	returnParams.setResponse(false);
+						//	response.set_return(returnParams);
+						//}
+					}
+					else{
+						System.out.println("No se encuentra el ususario en la bbdd");
+						returnParams.setResponse(false);
+						response.set_return(returnParams);
+					}
+
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else{
+				System.out.println("No se puede eliminar al Admin");
+				returnParams.setResponse(false);
+				response.set_return(returnParams);
+			}		
+		}
+		else{
+			System.out.println("No eres Admin");
+			returnParams.setResponse(false);
+			response.set_return(returnParams);
+		}
+		return response;
+
 	}
 
 
@@ -235,8 +294,48 @@ public class UPMSocialReadingSkeleton{
 			es.upm.fi.sos.ChangePassword changePassword
 			)
 	{
+		
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#changePassword");
+		ChangePasswordResponse response = new ChangePasswordResponse();
+		Response responseParam = new Response();
+		String userName = user.getName();
+		String newPwd = changePassword.getArgs0().getNewpwd();
+		String oldPwd = changePassword.getArgs0().getOldpwd();
+		ChangePassword _changePassword = new ChangePassword();
+		ChangePasswordBackEnd changeParam = new ChangePasswordBackEnd();
+		ChangePasswordResponseE rChangePassword = new ChangePasswordResponseE();
+		boolean result;
+		
+		
+		
+		if(loginList.containsKey(userName)){ // estoy logeado
+			changeParam.setName(userName);
+			changeParam.setOldpwd(oldPwd);
+			changeParam.setNewpwd(newPwd);
+			_changePassword.setChangePassword(changeParam);
+			try {
+				rChangePassword = stub.changePassword(_changePassword);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			result = rChangePassword.get_return().getResult();
+			responseParam.setResponse(result);
+			response.set_return(responseParam);
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		return response;
+		
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#changePassword");
 	}
 
 
