@@ -1,2 +1,3 @@
 service: $AXIS2_HOME/bin/wsdl2java.sh -s -ss -sd -wv 2.0 -p es.upm.fi.sos -d adb -uri UPMSocialReading.wsdl
+service2: $AXIS2_HOME/bin/wsdl2java.sh -uri UPMAuthenticationAuthorization.wsdl -wv 2.0 -p es.upm.fi.sos -d adb
 client: $AXIS2_HOME/bin/wsdl2java.sh -uri UPMSocialReading.wsdl -wv 2.0 -p es.upm.fi.sos.client -d adb
