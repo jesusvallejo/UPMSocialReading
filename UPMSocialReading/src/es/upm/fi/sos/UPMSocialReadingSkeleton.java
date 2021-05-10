@@ -12,6 +12,7 @@ package es.upm.fi.sos;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.ChangePassword;
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.RemoveUser;
@@ -20,12 +21,14 @@ import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.*;
 import es.upm.fi.sos.xsd.*;
 
 import org.apache.axis2.AxisFault;
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 public class UPMSocialReadingSkeleton{
 	private String AdminName = "admin";
 	private String AdminPwd = "admin";
 	private ArrayList<String> users = new ArrayList<String>();
 	private HashMap<String, ArrayList<String>> friendList = new HashMap<String, ArrayList<String>>();
-	private HashMap<String,HashMap<String, Book>> bookList = new HashMap<String,HashMap<String,Book>>();
+	private HashMap<String,TreeMap<String, Book>> bookList = new HashMap<String,TreeMap<String,Book>>();
 	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
@@ -184,7 +187,7 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyFriendReadings");
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyFriendReadings");
 	}
 
 
@@ -257,7 +260,7 @@ public class UPMSocialReadingSkeleton{
 				// inicializamos en lista de amigos , mb tambien para los libros
 				users.add(userName);
 				friendList.put(userName, new ArrayList<String>());
-				bookList.put(userName, new HashMap<String, Book>());
+				bookList.put(userName, new TreeMap<String, Book>());
 				System.out.println("Usuario Añadido");
 			}
 			returnParam.setPwd(rAddUser.get_return().getPassword());
@@ -368,7 +371,30 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyReadings");
+		GetMyReadingsResponse response = new GetMyReadingsResponse();
+		TitleList titleList = new TitleList();
+		String userName = user.getName();
+		if(loginList.containsKey(userName)){
+			String [] array;
+			array = (String [])bookList.get(userName).keySet().toArray();
+			// hay que dar de mas recientes a menos, invertir
+			for (int i = 0; i < array.length / 2; i++) {
+		        String temp = array[i];
+		        array[i] = array[array.length - 1 - i];
+		        array[array.length - 1 - i] = temp;
+		    }
+			titleList.setTitles(array);
+			titleList.setResult(true);
+			
+		}
+		else{
+			System.out.println("no estas logeado");
+			titleList.setResult(false);; // no estas logeadp
+		}
+		
+		response.set_return(titleList);
+		return response;
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyReadings");
 	}
 
 
