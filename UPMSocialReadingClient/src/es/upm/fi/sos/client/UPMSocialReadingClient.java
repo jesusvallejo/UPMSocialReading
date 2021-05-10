@@ -1,4 +1,5 @@
 package es.upm.fi.sos.client;
+
 import java.rmi.RemoteException;
 
 import org.apache.axis2.AxisFault;
@@ -20,23 +21,31 @@ import es.upm.fi.sos.client.UPMSocialReadingStub.*;
 
 public class UPMSocialReadingClient {
 
-	public static void main(String[] args) throws AxisFault ,RemoteException {
+	public static void main(String[] args) throws AxisFault, RemoteException {
 		// TODO Auto-generated method stub
+
+		// creamos el stub
+		UPMSocialReadingStub stub = new UPMSocialReadingStub();
+
+		// hacemos que el stub mantega la conexion
+		stub._getServiceClient().engageModule("addressing");
+		stub._getServiceClient().getOptions().setManageSession(true);
+
 		es.upm.fi.sos.client.UPMSocialReadingStub cliente;
 		es.upm.fi.sos.client.UPMSocialReadingStub cliente1;
 
 		try {
 			cliente = new es.upm.fi.sos.client.UPMSocialReadingStub();
-			cliente1= new es.upm.fi.sos.client.UPMSocialReadingStub();
+			cliente1 = new es.upm.fi.sos.client.UPMSocialReadingStub();
 		} catch (AxisFault e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		//cliente._getServiceClient().getOptions().setManageSession();
-		//cliente._getServiceClient().engageModule("addressing");
-		//cliente1._getServiceClient().getOptions().setManageSession(true);
-		//cliente1._getServiceClient().engageModule("addressing");
+		// cliente._getServiceClient().getOptions().setManageSession();
+		// cliente._getServiceClient().engageModule("addressing");
+		// cliente1._getServiceClient().getOptions().setManageSession(true);
+		// cliente1._getServiceClient().engageModule("addressing");
 		// log in Admin cliente para añadir user
 
 		Login login1 = new Login();
@@ -47,14 +56,11 @@ public class UPMSocialReadingClient {
 		LoginResponse r = cliente.login(login1);
 		System.out.println("SALIDA LOGIN ADMIN EN CLIENTE: " + r.get_return().getResponse());
 		/*
-		login1 = new Login();
-		param = new User();
-		param.setName("admin");
-		param.setPwd("admin");
-		login1.setArgs0(param);
-		r = cliente1.login(login1);
-		System.out.println("SALIDA LOGIN ADMIN EN CLIENTE1: " + r.get_return().getResponse());
-		*/
+		 * login1 = new Login(); param = new User(); param.setName("admin");
+		 * param.setPwd("admin"); login1.setArgs0(param); r = cliente1.login(login1);
+		 * System.out.println("SALIDA LOGIN ADMIN EN CLIENTE1: " +
+		 * r.get_return().getResponse());
+		 */
 		// añadir user client
 		AddUser addUser9 = new AddUser();
 		Username param2 = new Username();
@@ -63,43 +69,31 @@ public class UPMSocialReadingClient {
 		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
 		AddUserResponseE r2 = cliente.addUser(addUser9);
 		/*
-		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
-		String pwd = r2.get_return().getPwd();
-		System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
-
-		// añadir user client1
-		addUser9 = new AddUser();
-		param2 = new Username();
-		param2.setUsername("jvc01");
-		addUser9.setArgs0(param2);
-		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
-		r2 = cliente.addUser(addUser9);
-		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
-		pwd = r2.get_return().getPwd();
-		System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
-
-		Logout logout4 = new Logout();
-		cliente.logout(logout4);
-		logout4 = new Logout();
-		cliente1.logout(logout4);
-
-		// log in nuevos users
-		Login login14 = new Login();
-		User param3 = new User();
-		param3.setName("jvc00");
-		param3.setPwd(pwd);
-		login14.setArgs0(param3);
-		LoginResponse r3 = cliente.login(login14);
-		System.out.println("SALIDA LOGIN USER CLIENTE: " + r3.get_return().getResponse());
-		
-		login14 = new Login();
-		param3 = new User();
-		param3.setName("jvc00");
-		param3.setPwd(pwd);
-		login14.setArgs0(param3);
-		r3 = cliente1.login(login14);
-		System.out.println("SALIDA LOGIN CLIENTE1: " + r3.get_return().getResponse());
-		*/
+		 * System.out.println("SALIDA ADDUSER EN CLIENTE: " +
+		 * r2.get_return().getResponse()); String pwd = r2.get_return().getPwd();
+		 * System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
+		 * 
+		 * // añadir user client1 addUser9 = new AddUser(); param2 = new Username();
+		 * param2.setUsername("jvc01"); addUser9.setArgs0(param2);
+		 * System.out.println("PARAM2: " + addUser9.getArgs0().getUsername()); r2 =
+		 * cliente.addUser(addUser9); System.out.println("SALIDA ADDUSER EN CLIENTE: " +
+		 * r2.get_return().getResponse()); pwd = r2.get_return().getPwd();
+		 * System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
+		 * 
+		 * Logout logout4 = new Logout(); cliente.logout(logout4); logout4 = new
+		 * Logout(); cliente1.logout(logout4);
+		 * 
+		 * // log in nuevos users Login login14 = new Login(); User param3 = new User();
+		 * param3.setName("jvc00"); param3.setPwd(pwd); login14.setArgs0(param3);
+		 * LoginResponse r3 = cliente.login(login14);
+		 * System.out.println("SALIDA LOGIN USER CLIENTE: " +
+		 * r3.get_return().getResponse());
+		 * 
+		 * login14 = new Login(); param3 = new User(); param3.setName("jvc00");
+		 * param3.setPwd(pwd); login14.setArgs0(param3); r3 = cliente1.login(login14);
+		 * System.out.println("SALIDA LOGIN CLIENTE1: " +
+		 * r3.get_return().getResponse());
+		 */
 
 	}
 
