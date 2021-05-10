@@ -30,8 +30,9 @@ public class UPMSocialReadingSkeleton{
 	private HashMap<String, ArrayList<String>> friendList = new HashMap<String, ArrayList<String>>();
 	private HashMap<String,TreeMap<String, Book>> bookList = new HashMap<String,TreeMap<String,Book>>();
 	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
-	private User user = new User(); /// accessible to all methods in class
+	User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
+	int k = 0;
 	/**
 	 * Auto generated method signature
 	 * 
@@ -39,7 +40,6 @@ public class UPMSocialReadingSkeleton{
 	 * @return  
 	 */
 	public UPMSocialReadingSkeleton() throws AxisFault{
-		users.add(AdminName);
 	}
 
 	public void logout
@@ -276,7 +276,8 @@ public class UPMSocialReadingSkeleton{
 		String userName =addUser.getArgs0().getUsername();
 		addUserParams.setName(userName);
 		_addUser.setUser(addUserParams);
-
+        System.out.println(user.getName());
+        System.out.println(k);
 		if(user.getName().equals(AdminName)){// si somos el admin adelante
 			try {
 				System.out.println("check");
@@ -558,6 +559,8 @@ public class UPMSocialReadingSkeleton{
 			user.setName(name);// log in 
 			user.setPwd(pwd);
 			response.set_return(responseParam);
+			System.out.println("logeado");
+			k=1;
 		}
 		else{
 			LoginBackEnd loginParams = new LoginBackEnd();

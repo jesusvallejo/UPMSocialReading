@@ -33,8 +33,8 @@ public class UPMSocialReadingClient {
 			e.printStackTrace();
 			return;
 		}
-		//cliente._getServiceClient().getOptions().setManageSession();
-		//cliente._getServiceClient().engageModule("addressing");
+		cliente._getServiceClient().getOptions().setManageSession(true);
+		cliente._getServiceClient().engageModule("addressing");
 		//cliente1._getServiceClient().getOptions().setManageSession(true);
 		//cliente1._getServiceClient().engageModule("addressing");
 		// log in Admin cliente para añadir user
@@ -58,15 +58,15 @@ public class UPMSocialReadingClient {
 		// añadir user client
 		AddUser addUser9 = new AddUser();
 		Username param2 = new Username();
-		param2.setUsername("jvc00");
+		param2.setUsername("jvc0000");
 		addUser9.setArgs0(param2);
 		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
 		AddUserResponseE r2 = cliente.addUser(addUser9);
-		/*
+		
 		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
 		String pwd = r2.get_return().getPwd();
 		System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
-
+		/*
 		// añadir user client1
 		addUser9 = new AddUser();
 		param2 = new Username();
@@ -118,7 +118,7 @@ public class UPMSocialReadingClient {
 
 		System.out.println("Test 2: add user\n");
 
-		add_user.setArgs0(user);
+		//add_user.setArgs0(user);
 		String status = (stub.addUser(add_user).get_return().localResponse) ? "OK" : "ERROR";
 		System.out.printf("Status -> %s\n" + status);
 	}
