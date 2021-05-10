@@ -8,9 +8,13 @@
 
             
                 package es.upm.fi.sos;
-            
 
-            /**
+import javax.xml.namespace.QName;
+
+
+import org.apache.axis2.databinding.ADBException;
+
+/**
             *  ChangePassword bean class
             */
             @SuppressWarnings({"unchecked","unused"})
@@ -447,6 +451,30 @@
         }
 
         }//end of factory class
+
+
+
+	@Override
+	public XMLStreamReader getPullParser(QName arg0) throws XMLStreamException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public void serialize(QName arg0, XMLStreamWriter arg1) throws XMLStreamException, ADBException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void serialize(QName arg0, XMLStreamWriter arg1, boolean arg2) throws XMLStreamException, ADBException {
+		// TODO Auto-generated method stub
+		
+	}
 
         
 

@@ -24,12 +24,12 @@ public class UPMSocialReadingClient {
 		System.out.printf("Status -> %s\n" + status);
 	}
 
-	private static void test_2(UPMSocialReadingStub stub, AddUser add_user, User user)
+	private static void test_2(UPMSocialReadingStub stub, AddUser add_user, Username username)
 			throws RemoteException, IOException {
 
 		System.out.println("Test 2: add user\n");
 
-		add_user.setArgs0(user);
+		add_user.setArgs0(username);
 		String status = (stub.addUser(add_user).get_return().localResponse) ? "OK" : "ERROR";
 		System.out.printf("Status -> %s\n" + status);
 	}
