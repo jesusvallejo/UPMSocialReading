@@ -10,7 +10,9 @@ package es.upm.fi.sos;
  *  UPMSocialReadingSkeleton java skeleton for the axisService
  */
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
+
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.ChangePassword;
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.RemoveUser;
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Username;
@@ -21,6 +23,8 @@ import org.apache.axis2.AxisFault;
 public class UPMSocialReadingSkeleton{
 	private String AdminName = "admin";
 	private String AdminPwd = "admin";
+	private ArrayList<String> users = new ArrayList<String>();
+	private HashMap<String, ArrayList<String>> FriendList = new HashMap<String, ArrayList<String>>();
 	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
@@ -31,7 +35,7 @@ public class UPMSocialReadingSkeleton{
 	 * @return  
 	 */
 	public UPMSocialReadingSkeleton() throws AxisFault{
-
+		users.add(AdminName);
 	}
 
 	public void logout
@@ -64,7 +68,37 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#addFriend");
+		AddFriendResponse response = new AddFriendResponse();
+		Response responseParam = new Response();
+		String friend = addFriend.getArgs0().getUsername();
+		String userName = user.getName();
+		if (users.contains(friend) ){
+			if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
+				if(!(FriendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
+					FriendList.get(userName).add(friend);
+					responseParam.setResponse(true);
+					response.set_return(responseParam);
+				}
+				else{
+					System.out.println("ya es amigo");
+					responseParam.setResponse(false);
+					response.set_return(responseParam);
+				}
+			}
+			else{
+				System.out.println("no estas logeado");
+				responseParam.setResponse(false);
+				response.set_return(responseParam);
+			}
+		}
+		else{
+			System.out.println("el amigo no es usuario correcto");
+			responseParam.setResponse(false);
+			response.set_return(responseParam);
+		}
+		return response;
+
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#addFriend");
 	}
 
 
@@ -81,7 +115,36 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#removeFriend");
+		RemoveFriendResponse response = new RemoveFriendResponse();
+		Response responseParam = new Response();
+		String friend = removeFriend.getArgs0().getUsername();
+		String userName = user.getName();
+		if (users.contains(friend) ){
+			if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
+				if(FriendList.get(userName).contains(friend)){ //no se alamcenan amigos repetidos
+					FriendList.get(userName).remove(friend);
+					responseParam.setResponse(true);
+					response.set_return(responseParam);
+				}
+				else{
+					System.out.println("ya es amigo");
+					responseParam.setResponse(false);
+					response.set_return(responseParam);
+				}
+			}
+			else{
+				System.out.println("no estas logeado");
+				responseParam.setResponse(false);
+				response.set_return(responseParam);
+			}
+		}
+		else{
+			System.out.println("el amigo no es usuario correcto");
+			responseParam.setResponse(false);
+			response.set_return(responseParam);
+		}
+		return response;
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#removeFriend");
 	}
 
 
@@ -139,7 +202,8 @@ public class UPMSocialReadingSkeleton{
 		UserBackEnd addUserParams = new UserBackEnd();
 		es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUserResponse rAddUser = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUserResponse();
 		es.upm.fi.sos.xsd.AddUserResponse returnParam = new es.upm.fi.sos.xsd.AddUserResponse();
-		addUserParams.setName(addUser.getArgs0().getUsername());
+		String userName =addUser.getArgs0().getUsername();
+		addUserParams.setName(userName);
 		_addUser.setUser(addUserParams);
 
 		if(user.getName().equals(AdminName)){// si somos el admin adelante
@@ -151,7 +215,11 @@ public class UPMSocialReadingSkeleton{
 			}
 			result = rAddUser.get_return().getResult();
 			if(result){
-				// no se si tendremos que guardar los ususarios que tenemos y eso
+				// nuevo user
+				// inicializamos en lista de amigos , mb tambien para los libros
+				users.add(userName);
+				FriendList.put(userName, new ArrayList<String>());
+
 				System.out.println("Usuario Añadido");
 			}
 			returnParam.setPwd(rAddUser.get_return().getPassword());
@@ -189,30 +257,31 @@ public class UPMSocialReadingSkeleton{
 		boolean result;
 		RemoveUserResponse response = new RemoveUserResponse();
 		Response returnParams = new Response();
-		String name = removeUser.getArgs0().getUsername();
+		String userName = removeUser.getArgs0().getUsername();
 		Username param = new Username();
-		param.setName(name);
+		param.setName(userName);
 		ExistUser _existUser = new ExistUser();
 		_existUser.setUsername(param);
 		if(user.getName().equals(AdminName)){
-			if(!name.equals(AdminName)){ // if ususario logeado es admin y no se va a leminar admin
+			if(!userName.equals(AdminName)){ // if ususario logeado es admin y no se va a leminar admin
 				try {
 					if(stub.existUser(_existUser).get_return().getResult()){
 						//if(name.equals("Cambiar esto")){ // habra que ver si es un usuario nuestro creo CAMBIAR!!
-							RemoveUser removeParam = new RemoveUser();
-							RemoveUserE _removeUser = new RemoveUserE();
-							RemoveUserResponseE rRemove= new RemoveUserResponseE();
+						RemoveUser removeParam = new RemoveUser();
+						RemoveUserE _removeUser = new RemoveUserE();
+						RemoveUserResponseE rRemove= new RemoveUserResponseE();
 
-							removeParam.setName(name);
-							_removeUser.setRemoveUser(removeParam);
-							rRemove = stub.removeUser(_removeUser);
-							result =rRemove.get_return().getResult();
-							returnParams .setResponse(result);
-							if(result){
-								// eliminar libros y amigos de las listas
-								System.out.println("Usuario Eliminado");
-							}
-							response.set_return(returnParams);
+						removeParam.setName(userName);
+						_removeUser.setRemoveUser(removeParam);
+						rRemove = stub.removeUser(_removeUser);
+						result =rRemove.get_return().getResult();
+						returnParams .setResponse(result);
+						if(result){
+							// eliminar libros y amigos de las listas
+							users.remove(userName);
+							System.out.println("Usuario Eliminado");
+						}
+						response.set_return(returnParams);
 
 
 						//}
@@ -294,7 +363,7 @@ public class UPMSocialReadingSkeleton{
 			es.upm.fi.sos.ChangePassword changePassword
 			)
 	{
-		
+
 		//TODO : fill this with the necessary business logic
 		ChangePasswordResponse response = new ChangePasswordResponse();
 		Response responseParam = new Response();
@@ -321,11 +390,11 @@ public class UPMSocialReadingSkeleton{
 		else{
 			result = false;
 		}
-		
+
 		responseParam.setResponse(result);
 		response.set_return(responseParam);
 		return response;
-		
+
 		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#changePassword");
 	}
 
