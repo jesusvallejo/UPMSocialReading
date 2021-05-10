@@ -37,7 +37,13 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-
+		String userName = user.getName();
+		currentUser.replace(userName, currentUser.get(userName)-1); // eliminamos una sesion
+		if(currentUser.get(userName)==0){ //   si no quedan sesiones activas en el cliente
+			currentUser.remove(userName); // eliminamos del log el user
+			user.setName(null); // vaciamos el user name
+			user.setPwd(null); // vaciamos el user pwd
+		}
 
 	}
 
@@ -224,7 +230,7 @@ public class UPMSocialReadingSkeleton{
 		}
 
 		// solo puede logear si no hay nadie o si es el que esta logeado checkear esto
-		
+
 		if(name.equals(AdminName)&&pwd.equals(AdminPwd)){
 			responseParam.setResponse(true);// login directo, no check authenAutho
 			user.setName(name);// log in 
