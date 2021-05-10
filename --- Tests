@@ -1,0 +1,74 @@
+--- Tests
+1.  login
+	1.1 login Admin == True
+	1.2 login Usuario sin añadir == False
+	1.3 login Usuario añadido                         --> 3.2
+
+2.  addUserResponse
+	2.1  login Admin == True  
+		 addUser(jvc00)== True                        --> 3.2
+
+	2.2  login (jvc00) == True
+		 addUser(jvc01) == False
+
+    2.3  addUser(whatever)== False (login needed)
+
+3.  logout
+	3.1 login Admin == True
+		logout Admin == True
+
+	3.2 login Admin == True                           --> 4.1
+		addUser(jvc00) == True
+		logout Admin == True
+		login jvc00 == True
+		logout jvc00 == True  
+
+	3.3 logout Admin == False (login needed)
+	3.4 logout notUser == False
+
+4.  removeUser
+	4.1 login Admin == True                           --> 5.4
+		addUser(jvc00) == True
+		logout Admin == True
+		login jvc00 == True
+		logout jvc00 == True
+		login Admin == True
+		remove(jvc00) == True  
+
+	4.2 login Admin == True
+		remove(Admin) == False (admin cannot be removed)
+
+	4.3 login Admin == true
+		remove(notUser) == False
+
+	4.4 remove(whatever) == False (login needed)
+
+5.  changePassword
+	5.1 login Admin==True
+		changePwd(newpwd)==True
+
+	5.2 login jvc00==True
+		changePwd(newPwd)
+
+	5.3 changePwd(whatever) == False (login needed)
+
+	5.4 login Admin == True                           --> 6.1
+		addUser(jvc00) == True
+		logout Admin == True
+		login jvc00 == True
+		changePwd(newPwd) ==True
+		logout jvc00 == True
+		login Admin == True
+		remove(jvc00) == True
+
+6.  addFriend
+	6.1 login Admin == True
+		addUser(jvc00) == True
+		addUser(jvc01) == True
+		logout Admin == True
+		login jvc00 == True
+		changePwd(newPwd) == True
+		addFriend(jvc01) == True
+		logout jvc00 == True
+		login Admin == True
+		remove(jvc00) == True
