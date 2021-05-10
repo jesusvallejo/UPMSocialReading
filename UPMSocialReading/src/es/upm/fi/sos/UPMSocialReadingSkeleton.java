@@ -22,7 +22,7 @@ import es.upm.fi.sos.xsd.*;
 
 import org.apache.axis2.AxisFault;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
+
 public class UPMSocialReadingSkeleton{
 	private String AdminName = "admin";
 	private String AdminPwd = "admin";
@@ -269,7 +269,6 @@ public class UPMSocialReadingSkeleton{
 		//TODO : fill this with the necessary business logic
 		boolean result;
 		AddUserResponse response = new AddUserResponse();
-		Response responseParam = new Response();
 		es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUser _addUser = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUser();
 		UserBackEnd addUserParams = new UserBackEnd();
 		es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUserResponse rAddUser = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUserResponse();
@@ -280,6 +279,7 @@ public class UPMSocialReadingSkeleton{
 
 		if(user.getName().equals(AdminName)){// si somos el admin adelante
 			try {
+				System.out.println("check");
 				rAddUser = stub.addUser(_addUser);
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
