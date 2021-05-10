@@ -305,9 +305,6 @@ public class UPMSocialReadingSkeleton{
 		ChangePasswordBackEnd changeParam = new ChangePasswordBackEnd();
 		ChangePasswordResponseE rChangePassword = new ChangePasswordResponseE();
 		boolean result;
-		
-		
-		
 		if(loginList.containsKey(userName)){ // estoy logeado
 			changeParam.setName(userName);
 			changeParam.setOldpwd(oldPwd);
@@ -320,19 +317,13 @@ public class UPMSocialReadingSkeleton{
 				e.printStackTrace();
 			}
 			result = rChangePassword.get_return().getResult();
-			responseParam.setResponse(result);
-			response.set_return(responseParam);
-			
-			
+		}
+		else{
+			result = false;
 		}
 		
-		
-		
-		
-		
-		
-		
-		
+		responseParam.setResponse(result);
+		response.set_return(responseParam);
 		return response;
 		
 		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#changePassword");
