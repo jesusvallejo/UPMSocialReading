@@ -187,6 +187,37 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
+
+		GetMyFriendReadingsResponse response = new GetMyFriendReadingsResponse();
+		TitleList titleList = new TitleList();
+		String userName = user.getName();
+		String friend = getMyFriendReadings.getArgs0().getUsername();
+
+		if(loginList.containsKey(userName)){// esta logeado
+			if (friendList.get(userName).contains(friend)){ // son amigos
+				String [] array;
+				array = (String [])bookList.get(friend).keySet().toArray();
+				// hay que dar de mas recientes a menos, invertir
+				for (int i = 0; i < array.length / 2; i++) {
+					String temp = array[i];
+					array[i] = array[array.length - 1 - i];
+					array[array.length - 1 - i] = temp;
+				}
+				titleList.setTitles(array);
+				titleList.setResult(true);
+			}
+			else{
+				System.out.println("no sois amigos");
+				titleList.setResult(false); // no sois amigos
+			}
+		}
+		else{
+			System.out.println("no estas logeado");
+			titleList.setResult(false); // no estas logeadp
+		}
+
+		response.set_return(titleList);
+		return response;
 		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyFriendReadings");
 	}
 
@@ -379,19 +410,19 @@ public class UPMSocialReadingSkeleton{
 			array = (String [])bookList.get(userName).keySet().toArray();
 			// hay que dar de mas recientes a menos, invertir
 			for (int i = 0; i < array.length / 2; i++) {
-		        String temp = array[i];
-		        array[i] = array[array.length - 1 - i];
-		        array[array.length - 1 - i] = temp;
-		    }
+				String temp = array[i];
+				array[i] = array[array.length - 1 - i];
+				array[array.length - 1 - i] = temp;
+			}
 			titleList.setTitles(array);
 			titleList.setResult(true);
-			
+
 		}
 		else{
 			System.out.println("no estas logeado");
 			titleList.setResult(false);; // no estas logeadp
 		}
-		
+
 		response.set_return(titleList);
 		return response;
 		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyReadings");
@@ -419,7 +450,7 @@ public class UPMSocialReadingSkeleton{
 		int calificacion = addReading.getArgs0().getCalification();
 
 		if( loginList.containsKey(userName)){
-			
+
 			Book book = new Book();
 			book.setAuthor(Author);
 			book.setTitle(title);
