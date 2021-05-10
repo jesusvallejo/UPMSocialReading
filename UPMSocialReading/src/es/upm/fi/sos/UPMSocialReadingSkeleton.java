@@ -24,7 +24,7 @@ public class UPMSocialReadingSkeleton{
 	private String AdminName = "admin";
 	private String AdminPwd = "admin";
 	private ArrayList<String> users = new ArrayList<String>();
-	private HashMap<String, ArrayList<String>> FriendList = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> friendList = new HashMap<String, ArrayList<String>>();
 	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
@@ -74,8 +74,8 @@ public class UPMSocialReadingSkeleton{
 		String userName = user.getName();
 		if (users.contains(friend) ){
 			if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
-				if(!(FriendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
-					FriendList.get(userName).add(friend);
+				if(!(friendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
+					friendList.get(userName).add(friend);
 					responseParam.setResponse(true);
 					response.set_return(responseParam);
 				}
@@ -121,8 +121,8 @@ public class UPMSocialReadingSkeleton{
 		String userName = user.getName();
 		if (users.contains(friend) ){
 			if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
-				if(FriendList.get(userName).contains(friend)){ //no se alamcenan amigos repetidos
-					FriendList.get(userName).remove(friend);
+				if(friendList.get(userName).contains(friend)){ //no se alamcenan amigos repetidos
+					friendList.get(userName).remove(friend);
 					responseParam.setResponse(true);
 					response.set_return(responseParam);
 				}
@@ -178,7 +178,22 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyFriendList");
+		GetMyFriendListResponse response = new GetMyFriendListResponse();
+		//Response responseParam = new Response();
+		FriendList friends = new FriendList();
+		String userName = user.getName();
+		if(loginList.containsKey(userName)){
+		String [] friendsArray = (String[]) friendList.get(userName).toArray();
+		friends.setFriends(friendsArray);
+		friends.setResult(true);
+		}
+		else{
+			System.out.println("no estas logeado");
+			friends.setResult(false); // no estas logeadp
+		}
+		response.set_return(friends);
+		return response;
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMyFriendList");
 	}
 
 
@@ -218,7 +233,7 @@ public class UPMSocialReadingSkeleton{
 				// nuevo user
 				// inicializamos en lista de amigos , mb tambien para los libros
 				users.add(userName);
-				FriendList.put(userName, new ArrayList<String>());
+				friendList.put(userName, new ArrayList<String>());
 
 				System.out.println("Usuario Añadido");
 			}
