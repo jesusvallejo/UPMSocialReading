@@ -18,7 +18,9 @@ import org.apache.axis2.AxisFault;
 public class UPMSocialReadingSkeleton{
 	private String AdminName = "admin";
 	private String AdminPwd = "admin";
-	private HashMap<String,Integer> currentUser = new HashMap<String,Integer>();
+	private HashMap<String,Integer> loginList = new HashMap<String,Integer>();
+	private HashMap<String,> userFriends = new HashMap<String,String>();
+	private HashMap<String,Integer> userBooks = new HashMap<String,Integer>();
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
 	/**
@@ -38,9 +40,9 @@ public class UPMSocialReadingSkeleton{
 	{
 		//TODO : fill this with the necessary business logic
 		String userName = user.getName();
-		currentUser.replace(userName, currentUser.get(userName)-1); // eliminamos una sesion
-		if(currentUser.get(userName)==0){ //   si no quedan sesiones activas en el cliente
-			currentUser.remove(userName); // eliminamos del log el user
+		loginList.replace(userName, loginList.get(userName)-1); // eliminamos una sesion
+		if(loginList.get(userName)==0){ //   si no quedan sesiones activas en el cliente
+			loginList.remove(userName); // eliminamos del log el user
 			user.setName(null); // vaciamos el user name
 			user.setPwd(null); // vaciamos el user pwd
 		}
@@ -129,7 +131,44 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#addUser");
+		boolean result;
+		AddUserResponse response = new AddUserResponse();
+		Response responseParam = new Response();
+		es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUser _addUser = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUser();
+		UserBackEnd addUserParams = new UserBackEnd();
+		es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUserResponse rAddUser = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.AddUserResponse();
+		es.upm.fi.sos.xsd.AddUserResponse returnParam = new es.upm.fi.sos.xsd.AddUserResponse();
+		addUserParams.setName(addUser.getArgs0().getUsername());
+		_addUser.setUser(addUserParams);
+
+		if(user.getName().equals(AdminName)){// si somos el admin adelante
+			try {
+				rAddUser = stub.addUser(_addUser);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			result = rAddUser.get_return().getResult();
+			if(result){
+				// no se si tendremos que guardar los ususarios que tenemos y eso
+				System.out.println("Usuario Añadido");
+			}
+			returnParam.setPwd(rAddUser.get_return().getPassword());
+        	returnParam.setResponse(result);
+			response.set_return(returnParam);
+			
+		}
+		else{ // solo el admin puede realizar esta tarea, devolver false
+			
+			returnParam.setResponse(false);
+			response.set_return(returnParam);
+
+		}
+		return response;
+
+
+
+		
 	}
 
 
@@ -218,18 +257,18 @@ public class UPMSocialReadingSkeleton{
 		 * El login del usuario admin no se debe gestionar a través del servicio
 		 * UPMAuthenticationAuthorization.
 		 */
-		es.upm.fi.sos.LoginResponse response = new es.upm.fi.sos.LoginResponse();
+		LoginResponse response = new LoginResponse();
 		Response responseParam = new Response();
 		String name = login.getArgs0().getName();
 		String pwd = login.getArgs0().getPwd();
 
-		if (!(currentUser.isEmpty() || (currentUser.containsKey(name)))){ // no se puede logear 
+		if (!(loginList.isEmpty() || (loginList.containsKey(name)))){ // no se puede logear 
 			responseParam.setResponse(false);
 			response.set_return(responseParam);
 			return response;
 		}
 
-		// solo puede logear si no hay nadie o si es el que esta logeado checkear esto
+		// solo puede logear si no hay nadie logeado o si es él el que esta logeado checkear esto
 
 		if(name.equals(AdminName)&&pwd.equals(AdminPwd)){
 			responseParam.setResponse(true);// login directo, no check authenAutho
@@ -241,11 +280,11 @@ public class UPMSocialReadingSkeleton{
 			LoginBackEnd loginParams = new LoginBackEnd();
 			loginParams.setName(name);
 			loginParams.setPassword(pwd);
-			es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Login login6 = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Login();
-			login6.setLogin(loginParams);
+			es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Login _login = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Login();
+			_login.setLogin(loginParams);
 			es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.LoginResponse rLogin = new es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.LoginResponse();
 			try {
-				rLogin = stub.login(login6);
+				rLogin = stub.login(_login);
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -259,21 +298,21 @@ public class UPMSocialReadingSkeleton{
 
 			}
 			else {
-				Response param2 = new Response();
-				param2.setResponse(false);
-				response.set_return(param2);
+				Response returnParam = new Response();
+				returnParam.setResponse(false);
+				response.set_return(returnParam);
 				return response;
 			}
 		}
 		// handle login log
-		if (currentUser.isEmpty()){ //no hay nadie login
-			currentUser.put(name, 1);
+		if (loginList.isEmpty()){ //no hay nadie login
+			loginList.put(name, 1);
 		}
-		else if(currentUser.containsKey(name)){ // esta ya logeado
-			currentUser.replace(name, currentUser.get(name)+1);
+		else if(loginList.containsKey(name)){ // esta ya logeado
+			loginList.replace(name, loginList.get(name)+1);
 		}
 
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#login");
+		return response;
 	}
 
 }
