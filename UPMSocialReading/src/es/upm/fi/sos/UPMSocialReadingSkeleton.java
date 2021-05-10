@@ -25,6 +25,7 @@ public class UPMSocialReadingSkeleton{
 	private String AdminPwd = "admin";
 	private ArrayList<String> users = new ArrayList<String>();
 	private HashMap<String, ArrayList<String>> friendList = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, HashMap<String, Book>> bookList = new HashMap<String, HashMap<String, HashMap<String,Book>>>();
 	private HashMap<String,Integer> loginList = new HashMap<String,Integer>(); // nombre y sesiones abiertas
 	private User user = new User(); /// accessible to all methods in class
 	private UPMAuthenticationAuthorizationWSSkeletonStub stub = new UPMAuthenticationAuthorizationWSSkeletonStub();
@@ -72,29 +73,40 @@ public class UPMSocialReadingSkeleton{
 		Response responseParam = new Response();
 		String friend = addFriend.getArgs0().getUsername();
 		String userName = user.getName();
-		if (users.contains(friend) ){
-			if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
-				if(!(friendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
-					friendList.get(userName).add(friend);
-					responseParam.setResponse(true);
-					response.set_return(responseParam);
+
+		Username param = new Username();
+		param.setName(friend);
+		ExistUser _existUser = new ExistUser();
+		_existUser.setUsername(param);
+
+		try {
+			if (stub.existUser(_existUser).get_return().getResult()){
+				if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
+					if(!(friendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
+						friendList.get(userName).add(friend);
+						responseParam.setResponse(true);
+						response.set_return(responseParam);
+					}
+					else{
+						System.out.println("ya es amigo");
+						responseParam.setResponse(false);
+						response.set_return(responseParam);
+					}
 				}
 				else{
-					System.out.println("ya es amigo");
+					System.out.println("no estas logeado");
 					responseParam.setResponse(false);
 					response.set_return(responseParam);
 				}
 			}
 			else{
-				System.out.println("no estas logeado");
+				System.out.println("el amigo no es usuario correcto");
 				responseParam.setResponse(false);
 				response.set_return(responseParam);
 			}
-		}
-		else{
-			System.out.println("el amigo no es usuario correcto");
-			responseParam.setResponse(false);
-			response.set_return(responseParam);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return response;
 
@@ -119,29 +131,40 @@ public class UPMSocialReadingSkeleton{
 		Response responseParam = new Response();
 		String friend = removeFriend.getArgs0().getUsername();
 		String userName = user.getName();
-		if (users.contains(friend) ){
-			if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
-				if(friendList.get(userName).contains(friend)){ //no se alamcenan amigos repetidos
-					friendList.get(userName).remove(friend);
-					responseParam.setResponse(true);
-					response.set_return(responseParam);
+
+		Username param = new Username();
+		param.setName(friend);
+		ExistUser _existUser = new ExistUser();
+		_existUser.setUsername(param);
+
+		try {
+			if (stub.existUser(_existUser).get_return().getResult()){
+				if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
+					if(friendList.get(userName).contains(friend)){ //no se alamcenan amigos repetidos
+						friendList.get(userName).remove(friend);
+						responseParam.setResponse(true);
+						response.set_return(responseParam);
+					}
+					else{
+						System.out.println("ya es amigo");
+						responseParam.setResponse(false);
+						response.set_return(responseParam);
+					}
 				}
 				else{
-					System.out.println("ya es amigo");
+					System.out.println("no estas logeado");
 					responseParam.setResponse(false);
 					response.set_return(responseParam);
 				}
 			}
 			else{
-				System.out.println("no estas logeado");
+				System.out.println("el amigo no es usuario correcto");
 				responseParam.setResponse(false);
 				response.set_return(responseParam);
 			}
-		}
-		else{
-			System.out.println("el amigo no es usuario correcto");
-			responseParam.setResponse(false);
-			response.set_return(responseParam);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return response;
 		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#removeFriend");
@@ -183,9 +206,9 @@ public class UPMSocialReadingSkeleton{
 		FriendList friends = new FriendList();
 		String userName = user.getName();
 		if(loginList.containsKey(userName)){
-		String [] friendsArray = (String[]) friendList.get(userName).toArray();
-		friends.setFriends(friendsArray);
-		friends.setResult(true);
+			String [] friendsArray = (String[]) friendList.get(userName).toArray();
+			friends.setFriends(friendsArray);
+			friends.setResult(true);
 		}
 		else{
 			System.out.println("no estas logeado");
@@ -234,7 +257,7 @@ public class UPMSocialReadingSkeleton{
 				// inicializamos en lista de amigos , mb tambien para los libros
 				users.add(userName);
 				friendList.put(userName, new ArrayList<String>());
-
+				bookList.put(userName, new HashMap<String, Book>());
 				System.out.println("Usuario Añadido");
 			}
 			returnParam.setPwd(rAddUser.get_return().getPassword());
@@ -362,7 +385,36 @@ public class UPMSocialReadingSkeleton{
 			)
 	{
 		//TODO : fill this with the necessary business logic
-		throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#addReading");
+		AddReadingResponse response = new AddReadingResponse();
+		Response responseParam = new Response();
+		String userName = user.getName();
+		String Author = addReading.getArgs0().getAuthor();
+		String title = addReading.getArgs0().getTitle();
+		int calificacion = addReading.getArgs0().getCalification();
+
+		if( loginList.containsKey(userName)){
+			
+			Book book = new Book();
+			book.setAuthor(Author);
+			book.setTitle(title);
+			book.setCalification(calificacion);
+			if (!bookList.get(userName).containsKey(title)){
+				bookList.get(userName).put(title, book);
+			}
+			else{
+				bookList.get(userName).replace(title, book);
+			}
+			responseParam.setResponse(true);
+			response.set_return(responseParam);
+		}
+		else{
+			responseParam.setResponse(false);
+			response.set_return(responseParam);
+		}
+
+		return response;
+
+		//throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#addReading");
 	}
 
 
