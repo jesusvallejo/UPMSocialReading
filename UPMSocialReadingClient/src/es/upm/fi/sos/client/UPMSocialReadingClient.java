@@ -96,6 +96,27 @@ public class UPMSocialReadingClient {
 			return false;
 		}
 	}
+	
+	static boolean changePassword(UPMSocialReadingStub client,String oldPwd,String newPwd){
+		ChangePassword changePassword = new ChangePassword();
+		PasswordPair param = new PasswordPair();
+		param.setOldpwd(oldPwd);
+		param.setNewpwd(newPwd);
+		changePassword.setArgs0(param);
+		ChangePasswordResponse r;
+		try {
+			r = client.changePassword(changePassword);
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
+	
+	
 	static void testPrint(String message,boolean passed){
 		if( passed)
 			System.out.println("OK ++ Test "+ message +  " ++ OK");
@@ -122,12 +143,12 @@ public class UPMSocialReadingClient {
 
 
 		// 1.3.1 login Usuario añadido == True
-		
+
 		String user="jvc00";
 		login(client,"admin","admin");
 		addUser(client,user);
 		String pwd = userPwd.get(user);
-		System.out.println("	pwd:"+pwd);
+		//System.out.println("	pwd:"+pwd);
 		logout(client);
 		status = login(client,user,pwd);
 		testPrint("1.3 login newUser",status);
@@ -141,7 +162,7 @@ public class UPMSocialReadingClient {
 		login(client,"admin","admin");
 		addUser(client,user);
 		pwd = userPwd.get(user);
-		System.out.println("	pwd:"+pwd);
+		//System.out.println("	pwd:"+pwd);
 		logout(client);
 		status = login(client,user,pwd);
 		testPrint("1.3 login newUser",status);
@@ -158,7 +179,7 @@ public class UPMSocialReadingClient {
 		login(client,"admin","admin");
 		addUser(client,user);
 		String pwd = userPwd.get(user);
-		System.out.println("	pwd:"+pwd);
+		//System.out.println("	pwd:"+pwd);
 		logout(client);
 		login(client,user,pwd);
 		boolean status = addUser(client,user1);
@@ -168,19 +189,19 @@ public class UPMSocialReadingClient {
 		login(client,"admin","admin");
 		removeUser(client,user);
 		logout(client);
-		
+
 		// 2.2 addUser no login == False
 		status = addUser(client,user1);
 		testPrint("2.2 addUser not logged in",!status);
-		
+
 		// 2.3 usuario añadido por admin == True
-		
+
 		user="jvc00";
 		login(client,"admin","admin");
 		status = addUser(client,user);
 		testPrint("2.3 addUser by admin",status);
 		pwd = userPwd.get(user);
-		System.out.println("	pwd:"+pwd);
+		//System.out.println("	pwd:"+pwd);
 		logout(client);
 		login(client,user,pwd);
 		logout(client);
@@ -188,116 +209,90 @@ public class UPMSocialReadingClient {
 		login(client,"admin","admin");
 		removeUser(client,user);
 		logout(client);
+
+	}
+
+	static void test3(UPMSocialReadingStub client){
+		testPrint("3.1 logout",true);
+	}
+	static void test4(UPMSocialReadingStub client){
+		//4.1 eliminar admin por admin == False
+		login(client,"admin","admin");
+		boolean status = removeUser(client,"admin");
+		testPrint("4.1 remove admin by admin",!status);
+		logout(client);
+		//4.2 eliminar notauser por admin == False
+		login(client,"admin","admin");
+		status = removeUser(client,"notavaliduser");
+		testPrint("4.2 remove notauser by admin",!status);
+		logout(client);
+		//4.3 eliminar sin login == false
+		status = removeUser(client,"whatever");
+		testPrint("4.2 remove without log in",!status);
+		//4.4 eliminar siendo admin == true
+		String user="jvc00";
+		login(client,"admin","admin");
+		addUser(client,user);
+		String pwd = userPwd.get(user);
+		//System.out.println("	pwd:"+pwd);
+		logout(client);
+		login(client,user,pwd);
+		logout(client);
+		//clean up
+		login(client,"admin","admin");
+		status = removeUser(client,user);
+		testPrint("2.3 addUser by admin",status);
+		logout(client);
+	}
+
+	static void test5(UPMSocialReadingStub client){
+		
+		//5.1 change admin pwd == false
+		String newPwd = "newPwd";
+		login(client,"admin","admin");
+		boolean status = changePassword(client,"admin",newPwd);
+		testPrint("5.1 changepassword by admin",status);
+		logout(client); 
+		//5.2 change user password == true
+		String user="jvc00";
+		login(client,"admin","admin");
+		addUser(client,user);
+		String pwd = userPwd.get(user);
+		//System.out.println("	pwd:"+pwd);
+		logout(client);
+		login(client,user,pwd);
+		changePassword(client, pwd, newPwd);
+		testPrint("5.2 changePassword by user",status);
+		logout(client);
+		//clean up
+		login(client,"admin","admin");
+		removeUser(client,user);
+		logout(client);
+		//5.3 change pass not logged in == false
+		status = changePassword(client,"whatever", newPwd);
+		testPrint("5.3 changePassword no login",!status);
 		
 	}
-	
-	
-	
+
 
 	public static void main(String[] args) throws AxisFault ,RemoteException {
 		// TODO Auto-generated method stub
-		
+
 		// TODO Auto-generated method stub
 		es.upm.fi.sos.client.UPMSocialReadingStub client;
 		try {
 			client = new UPMSocialReadingStub();
 			client._getServiceClient().getOptions().setManageSession(true);
 			client._getServiceClient().engageModule("addressing");
-			test1(client);
-			test2(client);
-			
+			//test1(client);
+			//test2(client);
+			//test3(client);
+			//test4(client);
+			test5(client);
 
 		} catch (AxisFault e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
 		}
-		//es.upm.fi.sos.client.UPMSocialReadingStub cliente1;
-		//clientIns(client);
-
-
-
 	}
-
-	/* Tests the login of the admin superuser into the social network */
-	private static void test_1(UPMSocialReadingStub stub, Login login, User user) throws RemoteException, IOException {
-
-		System.out.println("Test 1: admin login\n");
-
-		login.setArgs0(user);
-		String status = (stub.login(login).get_return().localResponse) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n" + status);
-	}
-
-	private static void test_2(UPMSocialReadingStub stub, AddUser add_user, User user)
-			throws RemoteException, IOException {
-
-		System.out.println("Test 2: add user\n");
-
-		//add_user.setArgs0(user);
-		String status = (stub.addUser(add_user).get_return().localResponse) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n" + status);
-	}
-
-	private static void test_3(UPMSocialReadingStub stub, Login login, User user) throws RemoteException, IOException {
-
-		System.out.println("Test 3: user login\n");
-
-		login.setArgs0(user);
-		String status = (stub.login(login).get_return().localResponse) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n" + status);
-	}
-
-	private static void test_4(UPMSocialReadingStub stub, Logout logout) throws RemoteException, IOException {
-
-		System.out.println("Test 4: user logout\n");
-
-		stub.logout(logout);
-		String status = "OK";
-
-		System.out.printf("Status -> %s\n" + status);
-	}
-
-	private static void test_5(UPMSocialReadingStub stub, ChangePassword change_pass, PasswordPair pass_pair, User user,
-			Login login, Logout logout, String pass) throws RemoteException, IOException {
-
-		System.out.println("Test 5: change password\n");
-
-		/* Stores the results of the partial tests */
-		boolean[] tests = { false, false, false };
-		/* Try change password */
-		change_pass.setArgs0(pass_pair);
-
-		tests[0] = stub.changePassword(change_pass).get_return().localResponse;
-
-		/* Logout and try to login with the old pass */
-		stub.logout(logout);
-		login.setArgs0(user);
-		tests[1] = !stub.login(login).get_return().localResponse;
-
-		/* Try login with new pass */
-		user.setPwd(pass);
-		login.setArgs0(user);
-		tests[2] = stub.login(login).get_return().localResponse;
-
-		String status = (!Arrays.asList(tests).contains(false)) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n" + status);
-	}
-
-	private static void test_6(UPMSocialReadingStub stub, RemoveUser remove_user, Username username, Login login,
-			User user) throws IOException {
-
-		System.out.println("Test 6: remove user\n");
-
-		boolean[] tests = { false, false };
-		remove_user.setArgs0(username);
-		tests[0] = (stub.removeUser(remove_user).get_return().localResponse);
-
-		login.setArgs0(user);
-		tests[1] = (!stub.login(login).get_return().localResponse);
-
-		String status = (!Arrays.asList(tests).contains(false)) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n" + status);
-	}
-
 }

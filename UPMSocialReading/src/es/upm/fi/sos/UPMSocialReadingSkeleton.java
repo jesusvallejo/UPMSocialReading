@@ -513,22 +513,38 @@ public class UPMSocialReadingSkeleton{
 		ChangePasswordBackEnd changeParam = new ChangePasswordBackEnd();
 		ChangePasswordResponseE rChangePassword = new ChangePasswordResponseE();
 		boolean result;
+		
 		if(loginList.containsKey(userName)){ // estoy logeado
-			changeParam.setName(userName);
-			changeParam.setOldpwd(oldPwd);
-			changeParam.setNewpwd(newPwd);
-			_changePassword.setChangePassword(changeParam);
-			try {
-				rChangePassword = stub.changePassword(_changePassword);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(userName.equals(AdminName)&&oldPwd.equals(AdminPwd)){
+				System.out.println("changin pass"+userName);
+				AdminPwd = newPwd;
+				result = true;
 			}
-			result = rChangePassword.get_return().getResult();
+			else{
+				changeParam.setName(userName);
+				changeParam.setOldpwd(oldPwd);
+				changeParam.setNewpwd(newPwd);
+				_changePassword.setChangePassword(changeParam);
+				try {
+					System.out.println("changin pass"+userName);
+					rChangePassword = stub.changePassword(_changePassword);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					result = false;
+					responseParam.setResponse(result);
+					response.set_return(responseParam);
+					return response;
+				}
+				result = rChangePassword.get_return().getResult();
+			}
 		}
+
 		else{
+			System.out.println("not logged in");
 			result = false;
 		}
+
 
 		responseParam.setResponse(result);
 		response.set_return(responseParam);
@@ -574,7 +590,7 @@ public class UPMSocialReadingSkeleton{
 			user.setName(name);// log in 
 			user.setPwd(pwd);
 			response.set_return(responseParam);
-			System.out.println("logeado Admin");
+			System.out.println("logeado: Admin");
 
 		}
 		else{
@@ -591,7 +607,7 @@ public class UPMSocialReadingSkeleton{
 				e.printStackTrace();
 			}
 			boolean result = rLogin.get_return().getResult();
-			System.out.println("logeado"+name);
+			System.out.println("logeado: "+name);
 			if(result){
 				user.setName(name);
 				user.setPwd(pwd);
@@ -600,6 +616,7 @@ public class UPMSocialReadingSkeleton{
 
 			}
 			else {
+				System.out.println("no se puedo logear: "+name);
 				Response returnParam = new Response();
 				returnParam.setResponse(false);
 				response.set_return(returnParam);
