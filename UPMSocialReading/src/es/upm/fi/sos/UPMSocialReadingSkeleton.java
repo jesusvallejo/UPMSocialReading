@@ -20,7 +20,6 @@ import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.Username;
 import es.upm.fi.sos.UPMAuthenticationAuthorizationWSSkeletonStub.*;
 import es.upm.fi.sos.xsd.*;
 
-
 import org.apache.axis2.AxisFault;
 
 
@@ -89,24 +88,25 @@ public class UPMSocialReadingSkeleton{
 			if (stub.existUser(_existUser).get_return().getResult()){
 				if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
 					if(!(friendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
+						System.out.println("addFriend:"+friend+"ahora es amigo de "+userName);
 						friendList.get(userName).add(friend);
 						responseParam.setResponse(true);
 						response.set_return(responseParam);
 					}
 					else{
-						System.out.println("ya es amigo");
+						System.out.println("addFriend:ya es amigo");
 						responseParam.setResponse(false);
 						response.set_return(responseParam);
 					}
 				}
 				else{
-					System.out.println("no estas logeado");
+					System.out.println("addFriend:no estas logeado");
 					responseParam.setResponse(false);
 					response.set_return(responseParam);
 				}
 			}
 			else{
-				System.out.println("el amigo no es usuario correcto");
+				System.out.println("addFriend:el amigo no es usuario correcto en bbdd");
 				responseParam.setResponse(false);
 				response.set_return(responseParam);
 			}
@@ -279,35 +279,41 @@ public class UPMSocialReadingSkeleton{
 		String userName =addUser.getArgs0().getUsername();
 		addUserParams.setName(userName);
 		_addUser.setUser(addUserParams);
-        System.out.println(user.getName());
-        System.out.println(k);
-		if(user.getName().equals(AdminName)){// si somos el admin adelante
-			try {
-				System.out.println("check");
-				rAddUser = stub.addUser(_addUser);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			result = rAddUser.get_return().getResult();
-			if(result){
-				// nuevo user
-				// inicializamos en lista de amigos , mb tambien para los libros
-				users.add(userName);
-				friendList.put(userName, new ArrayList<String>());
-				bookList.put(userName, new TreeMap<String, Book>());
-				System.out.println("Usuario Añadido");
-			}
-			returnParam.setPwd(rAddUser.get_return().getPassword());
-			returnParam.setResponse(result);
-			response.set_return(returnParam);
 
+		if(loginList.containsKey(user.getName()) ){
+			if(user.getName().equals(AdminName)){// si somos el admin adelante
+				System.out.println("add: "+user.getName()+" puede añadir nuevos usuarios");
+				try {
+					rAddUser = stub.addUser(_addUser);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				result = rAddUser.get_return().getResult();
+				if(result){
+					// nuevo user
+					// inicializamos en lista de amigos , mb tambien para los libros
+					users.add(userName);
+					friendList.put(userName, new ArrayList<String>());
+					bookList.put(userName, new TreeMap<String, Book>());
+					System.out.println("add: Usuario Añadido");
+				}
+				returnParam.setPwd(rAddUser.get_return().getPassword());
+				returnParam.setResponse(result);
+				response.set_return(returnParam);
+
+			}
+			else{ // solo el admin puede realizar esta tarea, devolver false
+				System.out.println("add: "+user.getName()+" no puede añadir nuevos usuarios");
+				returnParam.setResponse(false);
+				response.set_return(returnParam);
+
+			}
 		}
-		else{ // solo el admin puede realizar esta tarea, devolver false
-
+		else{
+			System.out.println("add: no estas logeado");
 			returnParam.setResponse(false);
 			response.set_return(returnParam);
-
 		}
 		return response;
 
@@ -336,55 +342,63 @@ public class UPMSocialReadingSkeleton{
 		String userName = removeUser.getArgs0().getUsername();
 		Username param = new Username();
 		param.setName(userName);
+		System.out.println("eliminar"+userName);
 		ExistUser _existUser = new ExistUser();
 		_existUser.setUsername(param);
-		if(user.getName().equals(AdminName)){
-			if(!userName.equals(AdminName)){ // if ususario logeado es admin y no se va a leminar admin
-				try {
-					if(stub.existUser(_existUser).get_return().getResult()){
-						//if(name.equals("Cambiar esto")){ // habra que ver si es un usuario nuestro creo CAMBIAR!!
-						RemoveUser removeParam = new RemoveUser();
-						RemoveUserE _removeUser = new RemoveUserE();
-						RemoveUserResponseE rRemove= new RemoveUserResponseE();
+		if (loginList.containsKey(user.getName())){
+			if(user.getName().equals(AdminName) || user.getName().equals(userName)){
+				if(!userName.equals(AdminName)){ // if ususario logeado es admin y no se va a leminar admin
+					try {
+						if(stub.existUser(_existUser).get_return().getResult()){
+							//if(name.equals("Cambiar esto")){ // habra que ver si es un usuario nuestro creo CAMBIAR!!
+							RemoveUser removeParam = new RemoveUser();
+							RemoveUserE _removeUser = new RemoveUserE();
+							RemoveUserResponseE rRemove= new RemoveUserResponseE();
 
-						removeParam.setName(userName);
-						_removeUser.setRemoveUser(removeParam);
-						rRemove = stub.removeUser(_removeUser);
-						result =rRemove.get_return().getResult();
-						returnParams .setResponse(result);
-						if(result){
-							// eliminar libros y amigos de las listas
-							users.remove(userName);
-							System.out.println("Usuario Eliminado");
+							removeParam.setName(userName);
+							_removeUser.setRemoveUser(removeParam);
+							rRemove = stub.removeUser(_removeUser);
+							result =rRemove.get_return().getResult();
+							returnParams .setResponse(result);
+							if(result){
+								// eliminar libros y amigos de las listas
+								users.remove(userName);
+								System.out.println("remove: Usuario Eliminado");
+							}
+							response.set_return(returnParams);
+
+
+							//}
+							//else{
+							//	returnParams.setResponse(false);
+							//	response.set_return(returnParams);
+							//}
 						}
-						response.set_return(returnParams);
+						else{
+							System.out.println("Remove: No se encuentra el ususario en la bbdd");
+							returnParams.setResponse(false);
+							response.set_return(returnParams);
+						}
 
-
-						//}
-						//else{
-						//	returnParams.setResponse(false);
-						//	response.set_return(returnParams);
-						//}
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					else{
-						System.out.println("No se encuentra el ususario en la bbdd");
-						returnParams.setResponse(false);
-						response.set_return(returnParams);
-					}
-
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+				else{
+					System.out.println("remove: No se puede eliminar al Admin");
+					returnParams.setResponse(false);
+					response.set_return(returnParams);
+				}		
 			}
 			else{
-				System.out.println("No se puede eliminar al Admin");
+				System.out.println("remove: No eres Admin");
 				returnParams.setResponse(false);
 				response.set_return(returnParams);
-			}		
+			}
 		}
 		else{
-			System.out.println("No eres Admin");
+			System.out.println("remove: No estas logeado");
 			returnParams.setResponse(false);
 			response.set_return(returnParams);
 		}
@@ -463,9 +477,7 @@ public class UPMSocialReadingSkeleton{
 				bookList.get(userName).put(title, book);
 			}
 			else{
-				if (bookList.get(userName).containsKey(title)) {
-					bookList.get(userName).put(title, book);
-				}
+				bookList.get(userName).put(title, book);
 			}
 			responseParam.setResponse(true);
 			response.set_return(responseParam);
@@ -504,22 +516,38 @@ public class UPMSocialReadingSkeleton{
 		ChangePasswordBackEnd changeParam = new ChangePasswordBackEnd();
 		ChangePasswordResponseE rChangePassword = new ChangePasswordResponseE();
 		boolean result;
+		
 		if(loginList.containsKey(userName)){ // estoy logeado
-			changeParam.setName(userName);
-			changeParam.setOldpwd(oldPwd);
-			changeParam.setNewpwd(newPwd);
-			_changePassword.setChangePassword(changeParam);
-			try {
-				rChangePassword = stub.changePassword(_changePassword);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(userName.equals(AdminName)&&oldPwd.equals(AdminPwd)){
+				System.out.println("changin pass"+userName);
+				AdminPwd = newPwd;
+				result = true;
 			}
-			result = rChangePassword.get_return().getResult();
+			else{
+				changeParam.setName(userName);
+				changeParam.setOldpwd(oldPwd);
+				changeParam.setNewpwd(newPwd);
+				_changePassword.setChangePassword(changeParam);
+				try {
+					System.out.println("changin pass"+userName);
+					rChangePassword = stub.changePassword(_changePassword);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					result = false;
+					responseParam.setResponse(result);
+					response.set_return(responseParam);
+					return response;
+				}
+				result = rChangePassword.get_return().getResult();
+			}
 		}
+
 		else{
+			System.out.println("not logged in");
 			result = false;
 		}
+
 
 		responseParam.setResponse(result);
 		response.set_return(responseParam);
@@ -552,6 +580,7 @@ public class UPMSocialReadingSkeleton{
 		String pwd = login.getArgs0().getPwd();
 
 		if (!(loginList.isEmpty() || (loginList.containsKey(name)))){ // no se puede logear 
+			System.out.println("cannot login");
 			responseParam.setResponse(false);
 			response.set_return(responseParam);
 			return response;
@@ -564,8 +593,8 @@ public class UPMSocialReadingSkeleton{
 			user.setName(name);// log in 
 			user.setPwd(pwd);
 			response.set_return(responseParam);
-			System.out.println("logeado");
-			k=1;
+			System.out.println("logeado: Admin");
+
 		}
 		else{
 			LoginBackEnd loginParams = new LoginBackEnd();
@@ -581,6 +610,7 @@ public class UPMSocialReadingSkeleton{
 				e.printStackTrace();
 			}
 			boolean result = rLogin.get_return().getResult();
+			System.out.println("logeado: "+name);
 			if(result){
 				user.setName(name);
 				user.setPwd(pwd);
@@ -589,6 +619,7 @@ public class UPMSocialReadingSkeleton{
 
 			}
 			else {
+				System.out.println("no se puedo logear: "+name);
 				Response returnParam = new Response();
 				returnParam.setResponse(false);
 				response.set_return(returnParam);

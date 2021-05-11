@@ -15,234 +15,450 @@ import es.upm.fi.sos.client.UPMSocialReadingStub.Username;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.ws.rs.core.NewCookie;
 
 import es.upm.fi.sos.client.UPMSocialReadingStub;
 import es.upm.fi.sos.client.UPMSocialReadingStub.*;
 
 public class UPMSocialReadingClient {
 
-	/* Tests the login of the admin superuser into the social network */
-	private static void test_0(UPMSocialReadingStub stub, Login login, User user, int client)
-			throws RemoteException, IOException {
+	static HashMap<String, String> userPwd = new HashMap<String, String>();
 
-		System.out.println("Test 1: admin login (client" + client + ")\n");
-
-		login.setArgs0(user);
-		String status = (stub.login(login).get_return().localResponse) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n", status);
-	}
-
-	private static String test_1(UPMSocialReadingStub stub, AddUser add_user, Username username, int client)
-			throws RemoteException, IOException {
-
-		System.out.println("Test 2: add user (client" + client + ")\n");
-
-		add_user.setArgs0(username);
-		AddUserResponse res = stub.addUser(add_user).get_return();
-		String status = (res.localResponse) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n", status);
-		return res.getPwd();
-	}
-
-	private static void test_2(UPMSocialReadingStub stub, Login login, User user, int client)
-			throws RemoteException, IOException {
-
-		System.out.println("Test 3: user login (client" + client + ")\n");
-
-		login.setArgs0(user);
-		String status = (stub.login(login).get_return().localResponse) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n", status);
-	}
-
-	private static void test_3(UPMSocialReadingStub stub, Logout logout, int client)
-			throws RemoteException, IOException {
-
-		System.out.println("Test 4: user logout (client" + client + ")\n");
-
-		stub.logout(logout);
-		String status = "OK";
-
-		System.out.printf("Status -> %s\n", status);
-	}
-
-	private static void test_4(UPMSocialReadingStub stub, RemoveUser remove_user, Username username, Login login,
-			User user) throws IOException {
-
-		System.out.println("Test 5: remove user\n");
-
-		boolean[] tests = { false, false };
-		remove_user.setArgs0(username);
-		tests[0] = (stub.removeUser(remove_user).get_return().localResponse);
-
-		login.setArgs0(user);
-		tests[1] = (!stub.login(login).get_return().localResponse);
-
-		String status = (!Arrays.asList(tests).contains(false)) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n", status);
-	}
-
-	private static void test_5(UPMSocialReadingStub stub, ChangePassword change_pass, PasswordPair pass_pair, User user,
-			Login login, Logout logout, String pass) throws RemoteException, IOException {
-
-		System.out.println("Test 6: change password\n");
-
-		/* Stores the results of the partial tests */
-		boolean[] tests = { false, false, false };
-		/* Try change password */
-		change_pass.setArgs0(pass_pair);
-
-		tests[0] = stub.changePassword(change_pass).get_return().localResponse;
-
-		/* Logout and try to login with the old pass */
-		stub.logout(logout);
-		login.setArgs0(user);
-		tests[1] = !stub.login(login).get_return().localResponse;
-
-		/* Try login with new pass */
-		user.setPwd(pass);
-		login.setArgs0(user);
-		tests[2] = stub.login(login).get_return().localResponse;
-
-		String status = (!Arrays.asList(tests).contains(false)) ? "OK" : "ERROR";
-		System.out.printf("Status -> %s\n", status);
-	}
-	
-	
-	private static void test_6 (UPMSocialReadingStub client, String friend) {
-		
-	}
-	
-	private static void test_7() {}
-
-	public static void main(String[] args) throws AxisFault, RemoteException, Exception {
-		// TODO Auto-generated method stub
-
-		/* Define variables */
-		String admin = "admin";
-		String var_username_1 = "FranSus_1", var_username_2 = "FranSus_2";
-		String var_pwd_1, var_pwd_2;
-
-		es.upm.fi.sos.client.UPMSocialReadingStub cliente_1;
-		es.upm.fi.sos.client.UPMSocialReadingStub cliente_2;
-
+	static UPMSocialReadingStub clientIns(UPMSocialReadingStub client) {
 		try {
-			cliente_1 = new es.upm.fi.sos.client.UPMSocialReadingStub();
-			cliente_2 = new es.upm.fi.sos.client.UPMSocialReadingStub();
+			client = new UPMSocialReadingStub();
+			client._getServiceClient().getOptions().setManageSession(true);
+			client._getServiceClient().engageModule("addressing");
 		} catch (AxisFault e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
+			return null;
 		}
-		cliente_1._getServiceClient().getOptions().setManageSession(true);
-		cliente_1._getServiceClient().engageModule("addressing");
-		cliente_2._getServiceClient().getOptions().setManageSession(true);
-		cliente_2._getServiceClient().engageModule("addressing");
-
-		/* Test 1 : login with the admin user */
-		Login login_1 = new Login();
-		User user_1 = new User();
-		user_1.setName(admin);
-		user_1.setPwd(admin);
-		test_0(cliente_1, login_1, user_1, 1);
-		/* login with the admin user from other client */
-		login_1 = new Login();
-		user_1 = new User();
-		user_1.setName(admin);
-		user_1.setPwd(admin);
-		test_0(cliente_2, login_1, user_1, 2);
-
-		/* Test 2: add user */
-		AddUser add_user_1 = new AddUser();
-		Username username_1 = new Username();
-		username_1.setUsername(var_username_1);
-		var_pwd_1 = test_1(cliente_1, add_user_1, username_1, 1);
-
-		/* add user con client1 */
-		add_user_1 = new AddUser();
-		username_1 = new Username();
-		username_1.setUsername(var_username_2);
-		var_pwd_2 = test_1(cliente_2, add_user_1, username_1, 2);
-
-		/* Test 3: regular user login */
-		Login login_2 = new Login();
-		User user_2 = new User();
-		user_2.setName(var_username_1);
-		user_2.setPwd(var_pwd_1);
-		test_2(cliente_1, login_2, user_2, 1);
-
-		/* ATENCION: AQUI PUEDE QUE HAYA QUE DEVOLVER FALSE */
-		login_2 = new Login();
-		user_2 = new User();
-		user_2.setName(var_username_1);
-		user_2.setPwd(var_pwd_1);
-		test_2(cliente_1, login_2, user_2, 1);
-
-		/* Test 4: regular user logout */
-
-		Logout logout_1 = new Logout();
-		test_3(cliente_1, logout_1, 1);
-
-		/* Test 5: Remove user 
-		RemoveUser remove_user_1 = new RemoveUser();
-		Username username_2 = new Username();
-		username_2.setUsername(var_username_2);
-		test_5(cliente_1, remove_user_1, username_2, login, user);*/
-		// log in Admin cliente para añadir user
-
-		/*
-		 * Login login1 = new Login(); User param = new User(); param.setName("admin");
-		 * param.setPwd("admin"); login1.setArgs0(param); LoginResponse r =
-		 * cliente.login(login1); System.out.println("SALIDA LOGIN ADMIN EN CLIENTE: " +
-		 * r.get_return().getResponse());
-		 * 
-		 * login1 = new Login(); param = new User(); param.setName("admin");
-		 * param.setPwd("admin"); login1.setArgs0(param); r = cliente1.login(login1);
-		 * System.out.println("SALIDA LOGIN ADMIN EN CLIENTE1: " +
-		 * r.get_return().getResponse());
-		 * 
-		 * // añadir user client AddUser addUser9 = new AddUser(); Username param2 = new
-		 * Username(); param2.setUsername("jvc00"); addUser9.setArgs0(param2);
-		 * System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
-		 * AddUserResponseE r2 = cliente.addUser(addUser9);
-		 * System.out.println("SALIDA ADDUSER EN CLIENTE: " +
-		 * r2.get_return().getResponse()); String pwd = r2.get_return().getPwd();
-		 * System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
-		 * 
-		 * // añadir user client1 addUser9 = new AddUser(); param2 = new Username();
-		 * param2.setUsername("jvc01"); addUser9.setArgs0(param2);
-		 * System.out.println("PARAM2: " + addUser9.getArgs0().getUsername()); r2 =
-		 * cliente.addUser(addUser9); System.out.println("SALIDA ADDUSER EN CLIENTE: " +
-		 * r2.get_return().getResponse()); String pwd1 = r2.get_return().getPwd();
-		 * System.out.println("SALIDA 	CONTRASEÑA: " + pwd1); // Remove User -- ok
-		 * 
-		 * RemoveUser removeUser5 = new RemoveUser(); Username param9 = new Username();
-		 * param9.setUsername("jvc00"); removeUser5.setArgs0(param9); RemoveUserResponse
-		 * r12 = cliente.removeUser(removeUser5);
-		 * System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
-		 * removeUser5 = new RemoveUser(); param9 = new Username();
-		 * param9.setUsername("jvc01"); removeUser5.setArgs0(param9); r12 =
-		 * cliente.removeUser(removeUser5); System.out.println("SALIDA REMOVEUSER: " +
-		 * r12.get_return().getResponse());
-		 * 
-		 * Logout logout4 = new Logout(); cliente.logout(logout4); logout4 = new
-		 * Logout(); cliente1.logout(logout4); // log in nuevos users Login login14 =
-		 * new Login(); User param3 = new User(); param3.setName("jvc00");
-		 * param3.setPwd(pwd); login14.setArgs0(param3); LoginResponse r3 =
-		 * cliente.login(login14); System.out.println("SALIDA LOGIN USER CLIENTE: " +
-		 * r3.get_return().getResponse());
-		 * 
-		 * login14 = new Login(); param3 = new User(); param3.setName("jvc01");
-		 * param3.setPwd(pwd); login14.setArgs0(param3); r3 = cliente1.login(login14);
-		 * System.out.println("SALIDA LOGIN CLIENTE1: " +
-		 * r3.get_return().getResponse());
-		 */
-		// Remove User -- ok
-		/*
-		 * RemoveUser removeUser5 = new RemoveUser(); Username param9 = new Username();
-		 * param9.setUsername("jvc00"); removeUser5.setArgs0(param9); RemoveUserResponse
-		 * r12 = cliente.removeUser(removeUser5);
-		 * System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
-		 */
+		return client;
 	}
 
+	static boolean login(UPMSocialReadingStub client, String userName, String userPwd) {
+		Login login1 = new Login();
+		User param = new User();
+		param.setName(userName);
+		param.setPwd(userPwd);
+		login1.setArgs0(param);
+		try {
+			LoginResponse r = client.login(login1);
+			// System.out.println("SALIDA LOGIN ADMIN EN CLIENTE: " +
+			// r.get_return().getResponse());
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	static void logout(UPMSocialReadingStub client) {
+		Logout logout4 = new Logout();
+		try {
+			client.logout(logout4);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+	}
+
+	static boolean addUser(UPMSocialReadingStub client, String userName) {
+		AddUser addUser9 = new AddUser();
+		Username param2 = new Username();
+		param2.setUsername(userName);
+		addUser9.setArgs0(param2);
+		AddUserResponseE r2;
+		try {
+			r2 = client.addUser(addUser9);
+			String pwd = r2.get_return().getPwd();
+			userPwd.put(userName, pwd);
+			return r2.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	static boolean removeUser(UPMSocialReadingStub client, String userName) {
+		RemoveUser removeUser5 = new RemoveUser();
+		Username param9 = new Username();
+		param9.setUsername(userName);
+		removeUser5.setArgs0(param9);
+		RemoveUserResponse r12;
+		try {
+			r12 = client.removeUser(removeUser5);
+			return r12.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	static boolean changePassword(UPMSocialReadingStub client, String oldPwd, String newPwd) {
+		ChangePassword changePassword = new ChangePassword();
+		PasswordPair param = new PasswordPair();
+		param.setOldpwd(oldPwd);
+		param.setNewpwd(newPwd);
+		changePassword.setArgs0(param);
+		ChangePasswordResponse r;
+		try {
+			r = client.changePassword(changePassword);
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	static boolean addFriend(UPMSocialReadingStub client, String friend) {
+		AddFriend addFriend = new AddFriend();
+		Username param = new Username();
+		param.setUsername(friend);
+		addFriend.setArgs0(param);
+		AddFriendResponse r;
+		try {
+			r = client.addFriend(addFriend);
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	static boolean removeFriend(UPMSocialReadingStub client, String friend) {
+
+		RemoveFriend remove_friend = new RemoveFriend();
+		Username username = new Username();
+		username.setUsername(friend);
+		remove_friend.setArgs0(username);
+		RemoveFriendResponse r;
+		try {
+			r = client.removeFriend(remove_friend);
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	static void testPrint(String message, boolean passed) {
+		if (passed)
+			System.out.println("OK ++ Test " + message + " ++ OK");
+		else
+			System.out.println("BAD -- Test " + message + " -- BAD");
+	}
+
+	static void test1(UPMSocialReadingStub client) {
+		/*
+		 * 1. login 1.1 login Admin == True 1.2 login Usuario sin añadir == False 1.3
+		 * login Usuario añadido --> 3.2
+		 */
+		// 1.1 login Admin == True
+		boolean status = login(client, "admin", "admin");
+		logout(client);
+		testPrint("1.1 login Admin", status);
+
+		// 1.2 login Usuario sin añadir == False
+		status = login(client, "noexiste00", "noexiste00");
+		// logout(client);
+		testPrint("1.2 login noexiste", !status);
+
+		// 1.3.1 login Usuario añadido == True
+
+		String user = "jvc00";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		String pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		status = login(client, user, pwd);
+		testPrint("1.3 login newUser", status);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		logout(client);
+		// 1.3.2 login Usuario añadido == True
+		user = "jvc01";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		status = login(client, user, pwd);
+		testPrint("1.3 login newUser", status);
+		logout(client);
+		// cleanup
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		logout(client);
+	}
+
+	static void test2(UPMSocialReadingStub client) {
+		// 2.1 addUser by user == False
+		String user = "jvc00";
+		String user1 = "jvc01";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		String pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		boolean status = addUser(client, user1);
+		testPrint("2.1 addUser by user", !status);
+		logout(client);
+		// cleanup
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		logout(client);
+
+		// 2.2 addUser no login == False
+		status = addUser(client, user1);
+		testPrint("2.2 addUser not logged in", !status);
+
+		// 2.3 usuario añadido por admin == True
+
+		user = "jvc00";
+		login(client, "admin", "admin");
+		status = addUser(client, user);
+		testPrint("2.3 addUser by admin", status);
+		pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		logout(client);
+
+	}
+
+	static void test3(UPMSocialReadingStub client) {
+		testPrint("3.1 logout", true);
+	}
+
+	static void test4(UPMSocialReadingStub client) {
+		// 4.1 eliminar admin por admin == False
+		login(client, "admin", "admin");
+		boolean status = removeUser(client, "admin");
+		testPrint("4.1 remove admin by admin", !status);
+		logout(client);
+		// 4.2 eliminar notauser por admin == False
+		login(client, "admin", "admin");
+		status = removeUser(client, "notavaliduser");
+		testPrint("4.2 remove notauser by admin", !status);
+		logout(client);
+		// 4.3 eliminar sin login == false
+		status = removeUser(client, "whatever");
+		testPrint("4.2 remove without log in", !status);
+		// 4.4 eliminar siendo admin == true
+		String user = "jvc00";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		String pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		status = removeUser(client, user);
+		testPrint("2.3 addUser by admin", status);
+		logout(client);
+	}
+
+	static void test5(UPMSocialReadingStub client) {
+
+		// 5.1 change admin pwd == false
+		String newPwd = "newPwd";
+		login(client, "admin", "admin");
+		boolean status = changePassword(client, "admin", newPwd);
+		testPrint("5.1 changepassword by admin", status);
+		logout(client);
+		// 5.2 change user password == true
+		String user = "jvc00";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		String pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		changePassword(client, pwd, newPwd);
+		testPrint("5.2 changePassword by user", status);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		logout(client);
+		// 5.3 change pass not logged in == false
+		status = changePassword(client, "whatever", newPwd);
+		testPrint("5.3 changePassword no login", !status);
+		// 5.3 change pass not correct in == false
+		user = "jvc00";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		changePassword(client, "whatever", newPwd);
+		testPrint("5.2 changePassword by user old not correct", !status);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		logout(client);
+	}
+
+	static void test6(UPMSocialReadingStub client) {
+		// 6.1 addFriend not in bbdd == false
+		String user = "jvc00";
+		String user1 = "jvc01";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		String pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		boolean status = addFriend(client, user1);
+		testPrint("6.1 addFriend not in db", !status);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		removeUser(client, user1);
+		logout(client);
+		// 6.2 addFriend not logged in == false
+		status = addFriend(client, user1);
+		testPrint("6.2 addFriend no login", !status);
+		// 6.3 addFriend by user == true
+		user = "jvc00";
+		user1 = "jvc01";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		addUser(client, user1);
+		pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		status = addFriend(client, user1);
+		testPrint("6.3 addFriend by user", status);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		removeUser(client, user1);
+		logout(client);
+		// 6.3 addFriend twice by user == false
+		user = "jvc00";
+		user1 = "jvc01";
+		login(client, "admin", "admin");
+		addUser(client, user);
+		addUser(client, user1);
+		pwd = userPwd.get(user);
+		// System.out.println(" pwd:"+pwd);
+		logout(client);
+		login(client, user, pwd);
+		status = addFriend(client, user1);
+		status = addFriend(client, user1);
+		testPrint("6.3 addFriend by user", !status);
+		logout(client);
+		// clean up
+		login(client, "admin", "admin");
+		removeUser(client, user);
+		removeUser(client, user1);
+		logout(client);
+	}
+
+	static void test7(UPMSocialReadingStub client) {
+		/* Test remove friend */
+		/* Define variables */
+		String user_1 = "FranSus_1";
+		String user_2 = "FranSus_2";
+		boolean status;
+		String pwd;
+		/* 7.1 removeFriend not in friendlist == false */
+		login(client, "admin", "admin");
+		addUser(client, user_1);
+		pwd = userPwd.get(user_1);
+		logout(client);
+		/* Login as user_1 and try removing a friend not in friendlist */
+		login(client, user_1, pwd);
+		status = removeFriend(client, user_2);
+		testPrint("7.1 removeFriends not in friendlist", !status);
+		logout(client);
+		/* Cleanup */
+		login(client, "admin", "admin");
+		removeUser(client, user_1);
+		logout(client);
+
+		/* 7.2 user_1 adds user_2 as a friend */
+		login(client, "admin", "admin");
+		addUser(client, user_1);
+		addUser(client, user_2);
+		pwd = userPwd.get(user_1);
+		logout(client);
+
+		login(client, user_1, pwd);
+		status = addFriend(client, user_2);
+		testPrint("7.2 user_1 has added user_2", status);
+
+		/* 7.3 no login == false */
+		logout(client);
+		status = removeFriend(client, user_2);
+		testPrint("7.3 removeFriend no login", !status);
+
+		/* 7.3 removeFriend properly == true */
+		login(client, user_1, pwd);
+		status = removeFriend(client, user_2);
+		testPrint("7.4 removeFriend properly", status);
+
+		/* 7.4 removeFriend twice */
+		status = removeFriend(client, user_2);
+		testPrint("7.5 removeFriend twice", !status);
+		logout(client);
+
+		/* Cleanup */
+		login(client, "admin", "admin");
+		removeUser(client, user_1);
+		removeUser(client, user_2);
+		logout(client);
+	}
+
+	public static void main(String[] args) throws AxisFault, RemoteException {
+		// TODO Auto-generated method stub
+
+		// TODO Auto-generated method stub
+		es.upm.fi.sos.client.UPMSocialReadingStub client;
+		try {
+			client = new UPMSocialReadingStub();
+			client._getServiceClient().getOptions().setManageSession(true);
+			client._getServiceClient().engageModule("addressing");
+			// test1(client);
+			// test2(client);
+			// test3(client);
+			// test4(client);
+			// test5(client);
+			// test6(client);
+			test7(client);
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
