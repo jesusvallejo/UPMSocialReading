@@ -73,5 +73,6 @@
 	<classpathentry kind="lib" path="/home/franser/Programs/axis2-1.6.2/lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="/home/franser/Programs/axis2-1.6.2/lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="/home/franser/Programs/axis2-1.6.2/lib/XmlSchema-1.4.7.jar"/>
+	<classpathentry kind="lib" path="/home/franser/Programs/axis2-1.6.2/repository/modules/addressing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

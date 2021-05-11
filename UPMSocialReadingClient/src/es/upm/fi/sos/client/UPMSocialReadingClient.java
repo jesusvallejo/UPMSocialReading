@@ -20,109 +20,6 @@ import es.upm.fi.sos.client.UPMSocialReadingStub.*;
 
 public class UPMSocialReadingClient {
 
-	public static void main(String[] args) throws AxisFault ,RemoteException {
-		// TODO Auto-generated method stub
-		es.upm.fi.sos.client.UPMSocialReadingStub cliente;
-		es.upm.fi.sos.client.UPMSocialReadingStub cliente1;
-
-		try {
-			cliente = new es.upm.fi.sos.client.UPMSocialReadingStub();
-			cliente1= new es.upm.fi.sos.client.UPMSocialReadingStub();
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		cliente._getServiceClient().getOptions().setManageSession(true);
-		cliente._getServiceClient().engageModule("addressing");
-		cliente1._getServiceClient().getOptions().setManageSession(true);
-		cliente1._getServiceClient().engageModule("addressing");
-		// log in Admin cliente para añadir user
-
-		Login login1 = new Login();
-		User param = new User();
-		param.setName("admin");
-		param.setPwd("admin");
-		login1.setArgs0(param);
-		LoginResponse r = cliente.login(login1);
-		System.out.println("SALIDA LOGIN ADMIN EN CLIENTE: " + r.get_return().getResponse());
-		
-		login1 = new Login();
-		param = new User();
-		param.setName("admin");
-		param.setPwd("admin");
-		login1.setArgs0(param);
-		r = cliente1.login(login1);
-		System.out.println("SALIDA LOGIN ADMIN EN CLIENTE1: " + r.get_return().getResponse());
-		
-		// añadir user client
-		AddUser addUser9 = new AddUser();
-		Username param2 = new Username();
-		param2.setUsername("jvc00");
-		addUser9.setArgs0(param2);
-		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
-		AddUserResponseE r2 = cliente.addUser(addUser9);
-		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
-		String pwd = r2.get_return().getPwd();
-		System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
-	
-		// añadir user client1
-		addUser9 = new AddUser();
-		param2 = new Username();
-		param2.setUsername("jvc01");
-		addUser9.setArgs0(param2);
-		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
-		r2 = cliente.addUser(addUser9);
-		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
-		String pwd1 = r2.get_return().getPwd();
-		System.out.println("SALIDA 	CONTRASEÑA: " + pwd1);
-		// Remove User -- ok
-		
-		RemoveUser removeUser5 = new RemoveUser();
-		Username param9 = new Username();
-		param9.setUsername("jvc00");
-		removeUser5.setArgs0(param9);
-		RemoveUserResponse r12 = cliente.removeUser(removeUser5);
-		System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
-		removeUser5 = new RemoveUser();
-		param9 = new Username();
-		param9.setUsername("jvc01");
-		removeUser5.setArgs0(param9);
-		r12 = cliente.removeUser(removeUser5);
-		System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
-		/*
-		Logout logout4 = new Logout();
-		cliente.logout(logout4);
-		logout4 = new Logout();
-		cliente1.logout(logout4);
-		// log in nuevos users
-		Login login14 = new Login();
-		User param3 = new User();
-		param3.setName("jvc00");
-		param3.setPwd(pwd);
-		login14.setArgs0(param3);
-		LoginResponse r3 = cliente.login(login14);
-		System.out.println("SALIDA LOGIN USER CLIENTE: " + r3.get_return().getResponse());
-		
-		login14 = new Login();
-		param3 = new User();
-		param3.setName("jvc01");
-		param3.setPwd(pwd);
-		login14.setArgs0(param3);
-		r3 = cliente1.login(login14);
-		System.out.println("SALIDA LOGIN CLIENTE1: " + r3.get_return().getResponse());
-		*/
-		// Remove User -- ok
-		/*
-		RemoveUser removeUser5 = new RemoveUser();
-		Username param9 = new Username();
-		param9.setUsername("jvc00");
-		removeUser5.setArgs0(param9);
-		RemoveUserResponse r12 = cliente.removeUser(removeUser5);
-		System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
-		*/
-	}
-
 	/* Tests the login of the admin superuser into the social network */
 	private static void test_1(UPMSocialReadingStub stub, Login login, User user) throws RemoteException, IOException {
 
@@ -203,5 +100,110 @@ public class UPMSocialReadingClient {
 		String status = (!Arrays.asList(tests).contains(false)) ? "OK" : "ERROR";
 		System.out.printf("Status -> %s\n" + status);
 	}
+	
+	public static void main(String[] args) throws AxisFault ,RemoteException {
+		// TODO Auto-generated method stub
+		es.upm.fi.sos.client.UPMSocialReadingStub cliente;
+		es.upm.fi.sos.client.UPMSocialReadingStub cliente1;
+
+		try {
+			cliente = new es.upm.fi.sos.client.UPMSocialReadingStub();
+			cliente1= new es.upm.fi.sos.client.UPMSocialReadingStub();
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+		cliente._getServiceClient().getOptions().setManageSession(true);
+		cliente._getServiceClient().engageModule("addressing");
+		cliente1._getServiceClient().getOptions().setManageSession(true);
+		cliente1._getServiceClient().engageModule("addressing");
+		// log in Admin cliente para añadir user
+
+		/*Login login1 = new Login();
+		User param = new User();
+		param.setName("admin");
+		param.setPwd("admin");
+		login1.setArgs0(param);
+		LoginResponse r = cliente.login(login1);
+		System.out.println("SALIDA LOGIN ADMIN EN CLIENTE: " + r.get_return().getResponse());
+		
+		login1 = new Login();
+		param = new User();
+		param.setName("admin");
+		param.setPwd("admin");
+		login1.setArgs0(param);
+		r = cliente1.login(login1);
+		System.out.println("SALIDA LOGIN ADMIN EN CLIENTE1: " + r.get_return().getResponse());
+		
+		// añadir user client
+		AddUser addUser9 = new AddUser();
+		Username param2 = new Username();
+		param2.setUsername("jvc00");
+		addUser9.setArgs0(param2);
+		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
+		AddUserResponseE r2 = cliente.addUser(addUser9);
+		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
+		String pwd = r2.get_return().getPwd();
+		System.out.println("SALIDA 	CONTRASEÑA: " + pwd);
+	
+		// añadir user client1
+		addUser9 = new AddUser();
+		param2 = new Username();
+		param2.setUsername("jvc01");
+		addUser9.setArgs0(param2);
+		System.out.println("PARAM2: " + addUser9.getArgs0().getUsername());
+		r2 = cliente.addUser(addUser9);
+		System.out.println("SALIDA ADDUSER EN CLIENTE: " + r2.get_return().getResponse());
+		String pwd1 = r2.get_return().getPwd();
+		System.out.println("SALIDA 	CONTRASEÑA: " + pwd1);
+		// Remove User -- ok
+		
+		RemoveUser removeUser5 = new RemoveUser();
+		Username param9 = new Username();
+		param9.setUsername("jvc00");
+		removeUser5.setArgs0(param9);
+		RemoveUserResponse r12 = cliente.removeUser(removeUser5);
+		System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
+		removeUser5 = new RemoveUser();
+		param9 = new Username();
+		param9.setUsername("jvc01");
+		removeUser5.setArgs0(param9);
+		r12 = cliente.removeUser(removeUser5);
+		System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
+		
+		Logout logout4 = new Logout();
+		cliente.logout(logout4);
+		logout4 = new Logout();
+		cliente1.logout(logout4);
+		// log in nuevos users
+		Login login14 = new Login();
+		User param3 = new User();
+		param3.setName("jvc00");
+		param3.setPwd(pwd);
+		login14.setArgs0(param3);
+		LoginResponse r3 = cliente.login(login14);
+		System.out.println("SALIDA LOGIN USER CLIENTE: " + r3.get_return().getResponse());
+		
+		login14 = new Login();
+		param3 = new User();
+		param3.setName("jvc01");
+		param3.setPwd(pwd);
+		login14.setArgs0(param3);
+		r3 = cliente1.login(login14);
+		System.out.println("SALIDA LOGIN CLIENTE1: " + r3.get_return().getResponse());
+		*/
+		// Remove User -- ok
+		/*
+		RemoveUser removeUser5 = new RemoveUser();
+		Username param9 = new Username();
+		param9.setUsername("jvc00");
+		removeUser5.setArgs0(param9);
+		RemoveUserResponse r12 = cliente.removeUser(removeUser5);
+		System.out.println("SALIDA REMOVEUSER: " + r12.get_return().getResponse());
+		*/
+	}
+
+	
 
 }

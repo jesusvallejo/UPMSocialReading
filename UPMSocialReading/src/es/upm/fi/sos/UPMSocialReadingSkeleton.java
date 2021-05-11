@@ -50,7 +50,9 @@ public class UPMSocialReadingSkeleton{
 	{
 		//TODO : fill this with the necessary business logic
 		String userName = user.getName();
-		loginList.replace(userName, loginList.get(userName)-1); // eliminamos una sesion
+		if (loginList.containsKey(userName)) {
+			loginList.put(userName, loginList.get(userName)-1);
+		} // Eliminamos una sesion
 		if(loginList.get(userName)==0){ //   si no quedan sesiones activas en el cliente
 			loginList.remove(userName); // eliminamos del log el user
 			user.setName(null); // vaciamos el user name
@@ -461,7 +463,9 @@ public class UPMSocialReadingSkeleton{
 				bookList.get(userName).put(title, book);
 			}
 			else{
-				bookList.get(userName).replace(title, book);
+				if (bookList.get(userName).containsKey(title)) {
+					bookList.get(userName).put(title, book);
+				}
 			}
 			responseParam.setResponse(true);
 			response.set_return(responseParam);
@@ -596,7 +600,7 @@ public class UPMSocialReadingSkeleton{
 			loginList.put(name, 1);
 		}
 		else if(loginList.containsKey(name)){ // esta ya logeado
-			loginList.replace(name, loginList.get(name)+1);
+			loginList.put(name, loginList.get(name)+1);
 		}
 
 		return response;
