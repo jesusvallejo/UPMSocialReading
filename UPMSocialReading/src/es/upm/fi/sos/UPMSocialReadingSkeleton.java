@@ -86,6 +86,7 @@ public class UPMSocialReadingSkeleton{
 			if (stub.existUser(_existUser).get_return().getResult()){
 				if( loginList.containsKey(userName)){ // esta dado de alta el amigo y estamos logeados
 					if(!(friendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
+						System.out.println("addFriend:"+friend+"ahora es amigo de "+userName);
 						friendList.get(userName).add(friend);
 						responseParam.setResponse(true);
 						response.set_return(responseParam);

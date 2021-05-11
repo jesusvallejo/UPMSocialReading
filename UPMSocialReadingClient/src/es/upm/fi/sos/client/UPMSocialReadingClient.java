@@ -114,7 +114,7 @@ public class UPMSocialReadingClient {
 		}
 
 	}
-	
+
 	static boolean addFriend(UPMSocialReadingStub client, String friend){
 		AddFriend addFriend = new AddFriend();
 		Username param = new Username();
@@ -129,7 +129,7 @@ public class UPMSocialReadingClient {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 	}
 
 
@@ -343,8 +343,27 @@ public class UPMSocialReadingClient {
 		removeUser(client,user);
 		removeUser(client,user1);
 		logout(client);
+		//6.3 addFriend twice by user == false
+		user="jvc00";
+		user1="jvc01";
+		login(client,"admin","admin");
+		addUser(client,user);
+		addUser(client,user1);
+		pwd = userPwd.get(user);
+		//System.out.println("	pwd:"+pwd);
+		logout(client);
+		login(client,user,pwd);
+		status = addFriend(client,user1);
+		status = addFriend(client,user1);
+		testPrint("6.3 addFriend by user",!status);
+		logout(client);
+		//clean up
+		login(client,"admin","admin");
+		removeUser(client,user);
+		removeUser(client,user1);
+		logout(client);
 	}
-	
+
 
 
 	public static void main(String[] args) throws AxisFault ,RemoteException {
