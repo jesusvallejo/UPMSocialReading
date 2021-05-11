@@ -96,7 +96,7 @@ public class UPMSocialReadingClient {
 			return false;
 		}
 	}
-	
+
 	static boolean changePassword(UPMSocialReadingStub client,String oldPwd,String newPwd){
 		ChangePassword changePassword = new ChangePassword();
 		PasswordPair param = new PasswordPair();
@@ -112,11 +112,28 @@ public class UPMSocialReadingClient {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 	}
 	
-	
-	
+	static boolean addFriend(UPMSocialReadingStub client, String friend){
+		AddFriend addFriend = new AddFriend();
+		Username param = new Username();
+		param.setUsername(friend);
+		addFriend.setArgs0(param);
+		AddFriendResponse r;
+		try {
+			r = client.addFriend(addFriend);
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+
+
+
 	static void testPrint(String message,boolean passed){
 		if( passed)
 			System.out.println("OK ++ Test "+ message +  " ++ OK");
@@ -246,7 +263,7 @@ public class UPMSocialReadingClient {
 	}
 
 	static void test5(UPMSocialReadingStub client){
-		
+
 		//5.1 change admin pwd == false
 		String newPwd = "newPwd";
 		login(client,"admin","admin");
@@ -271,8 +288,63 @@ public class UPMSocialReadingClient {
 		//5.3 change pass not logged in == false
 		status = changePassword(client,"whatever", newPwd);
 		testPrint("5.3 changePassword no login",!status);
-		
+		//5.3 change pass not correct in == false
+		user="jvc00";
+		login(client,"admin","admin");
+		addUser(client,user);
+		pwd = userPwd.get(user);
+		//System.out.println("	pwd:"+pwd);
+		logout(client);
+		login(client,user,pwd);
+		changePassword(client, "whatever", newPwd);
+		testPrint("5.2 changePassword by user old not correct",!status);
+		logout(client);
+		//clean up
+		login(client,"admin","admin");
+		removeUser(client,user);
+		logout(client);
 	}
+	static void test6(UPMSocialReadingStub client){
+		//6.1 addFriend not in bbdd == false
+		String user="jvc00";
+		String user1="jvc01";
+		login(client,"admin","admin");
+		addUser(client,user);
+		String pwd = userPwd.get(user);
+		//System.out.println("	pwd:"+pwd);
+		logout(client);
+		login(client,user,pwd);
+		boolean status = addFriend(client,user1);
+		testPrint("6.1 addFriend not in db",!status);
+		logout(client);
+		//clean up
+		login(client,"admin","admin");
+		removeUser(client,user);
+		removeUser(client,user1);
+		logout(client);
+		//6.2 addFriend not logged in == false
+		status = addFriend(client,user1);
+		testPrint("6.2 addFriend no login",!status);
+		//6.3 addFriend by user == true
+		user="jvc00";
+		user1="jvc01";
+		login(client,"admin","admin");
+		addUser(client,user);
+		addUser(client,user1);
+		pwd = userPwd.get(user);
+		//System.out.println("	pwd:"+pwd);
+		logout(client);
+		login(client,user,pwd);
+		status = addFriend(client,user1);
+		testPrint("6.3 addFriend by user",status);
+		logout(client);
+		//clean up
+		login(client,"admin","admin");
+		removeUser(client,user);
+		removeUser(client,user1);
+		logout(client);
+	}
+	
 
 
 	public static void main(String[] args) throws AxisFault ,RemoteException {
@@ -288,8 +360,8 @@ public class UPMSocialReadingClient {
 			//test2(client);
 			//test3(client);
 			//test4(client);
-			test5(client);
-
+			//test5(client);
+			test6(client);
 		} catch (AxisFault e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

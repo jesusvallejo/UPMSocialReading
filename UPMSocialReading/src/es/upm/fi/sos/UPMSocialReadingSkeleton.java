@@ -91,19 +91,19 @@ public class UPMSocialReadingSkeleton{
 						response.set_return(responseParam);
 					}
 					else{
-						System.out.println("ya es amigo");
+						System.out.println("addFriend:ya es amigo");
 						responseParam.setResponse(false);
 						response.set_return(responseParam);
 					}
 				}
 				else{
-					System.out.println("no estas logeado");
+					System.out.println("addFriend:no estas logeado");
 					responseParam.setResponse(false);
 					response.set_return(responseParam);
 				}
 			}
 			else{
-				System.out.println("el amigo no es usuario correcto");
+				System.out.println("addFriend:el amigo no es usuario correcto en bbdd");
 				responseParam.setResponse(false);
 				response.set_return(responseParam);
 			}
