@@ -22,7 +22,7 @@ import es.upm.fi.sos.client.UPMSocialReadingStub.*;
 public class UPMSocialReadingClient {
 
 	/* Tests the login of the admin superuser into the social network */
-	private static void test_1(UPMSocialReadingStub stub, Login login, User user, int client)
+	private static void test_0(UPMSocialReadingStub stub, Login login, User user, int client)
 			throws RemoteException, IOException {
 
 		System.out.println("Test 1: admin login (client" + client + ")\n");
@@ -32,7 +32,7 @@ public class UPMSocialReadingClient {
 		System.out.printf("Status -> %s\n", status);
 	}
 
-	private static String test_2(UPMSocialReadingStub stub, AddUser add_user, Username username, int client)
+	private static String test_1(UPMSocialReadingStub stub, AddUser add_user, Username username, int client)
 			throws RemoteException, IOException {
 
 		System.out.println("Test 2: add user (client" + client + ")\n");
@@ -44,7 +44,7 @@ public class UPMSocialReadingClient {
 		return res.getPwd();
 	}
 
-	private static void test_3(UPMSocialReadingStub stub, Login login, User user, int client)
+	private static void test_2(UPMSocialReadingStub stub, Login login, User user, int client)
 			throws RemoteException, IOException {
 
 		System.out.println("Test 3: user login (client" + client + ")\n");
@@ -54,7 +54,7 @@ public class UPMSocialReadingClient {
 		System.out.printf("Status -> %s\n", status);
 	}
 
-	private static void test_4(UPMSocialReadingStub stub, Logout logout, int client)
+	private static void test_3(UPMSocialReadingStub stub, Logout logout, int client)
 			throws RemoteException, IOException {
 
 		System.out.println("Test 4: user logout (client" + client + ")\n");
@@ -65,10 +65,10 @@ public class UPMSocialReadingClient {
 		System.out.printf("Status -> %s\n", status);
 	}
 
-	private static void test_5(UPMSocialReadingStub stub, RemoveUser remove_user, Username username, Login login,
+	private static void test_4(UPMSocialReadingStub stub, RemoveUser remove_user, Username username, Login login,
 			User user) throws IOException {
 
-		System.out.println("Test 6: remove user\n");
+		System.out.println("Test 5: remove user\n");
 
 		boolean[] tests = { false, false };
 		remove_user.setArgs0(username);
@@ -81,10 +81,10 @@ public class UPMSocialReadingClient {
 		System.out.printf("Status -> %s\n", status);
 	}
 
-	private static void test_6(UPMSocialReadingStub stub, ChangePassword change_pass, PasswordPair pass_pair, User user,
+	private static void test_5(UPMSocialReadingStub stub, ChangePassword change_pass, PasswordPair pass_pair, User user,
 			Login login, Logout logout, String pass) throws RemoteException, IOException {
 
-		System.out.println("Test 5: change password\n");
+		System.out.println("Test 6: change password\n");
 
 		/* Stores the results of the partial tests */
 		boolean[] tests = { false, false, false };
@@ -106,6 +106,13 @@ public class UPMSocialReadingClient {
 		String status = (!Arrays.asList(tests).contains(false)) ? "OK" : "ERROR";
 		System.out.printf("Status -> %s\n", status);
 	}
+	
+	
+	private static void test_6 (UPMSocialReadingStub client, String friend) {
+		
+	}
+	
+	private static void test_7() {}
 
 	public static void main(String[] args) throws AxisFault, RemoteException, Exception {
 		// TODO Auto-generated method stub
@@ -136,44 +143,44 @@ public class UPMSocialReadingClient {
 		User user_1 = new User();
 		user_1.setName(admin);
 		user_1.setPwd(admin);
-		test_1(cliente_1, login_1, user_1, 1);
+		test_0(cliente_1, login_1, user_1, 1);
 		/* login with the admin user from other client */
 		login_1 = new Login();
 		user_1 = new User();
 		user_1.setName(admin);
 		user_1.setPwd(admin);
-		test_1(cliente_2, login_1, user_1, 2);
+		test_0(cliente_2, login_1, user_1, 2);
 
 		/* Test 2: add user */
 		AddUser add_user_1 = new AddUser();
 		Username username_1 = new Username();
 		username_1.setUsername(var_username_1);
-		var_pwd_1 = test_2(cliente_1, add_user_1, username_1, 1);
+		var_pwd_1 = test_1(cliente_1, add_user_1, username_1, 1);
 
 		/* add user con client1 */
 		add_user_1 = new AddUser();
 		username_1 = new Username();
 		username_1.setUsername(var_username_2);
-		var_pwd_2 = test_2(cliente_2, add_user_1, username_1, 2);
+		var_pwd_2 = test_1(cliente_2, add_user_1, username_1, 2);
 
 		/* Test 3: regular user login */
 		Login login_2 = new Login();
 		User user_2 = new User();
 		user_2.setName(var_username_1);
 		user_2.setPwd(var_pwd_1);
-		test_3(cliente_1, login_2, user_2, 1);
+		test_2(cliente_1, login_2, user_2, 1);
 
 		/* ATENCION: AQUI PUEDE QUE HAYA QUE DEVOLVER FALSE */
 		login_2 = new Login();
 		user_2 = new User();
 		user_2.setName(var_username_1);
 		user_2.setPwd(var_pwd_1);
-		test_3(cliente_1, login_2, user_2, 1);
+		test_2(cliente_1, login_2, user_2, 1);
 
 		/* Test 4: regular user logout */
 
 		Logout logout_1 = new Logout();
-		test_4(cliente_1, logout_1, 1);
+		test_3(cliente_1, logout_1, 1);
 
 		/* Test 5: Remove user 
 		RemoveUser remove_user_1 = new RemoveUser();
