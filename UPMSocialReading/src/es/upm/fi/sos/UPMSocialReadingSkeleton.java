@@ -429,13 +429,15 @@ public class UPMSocialReadingSkeleton{
 		String userName = user.getName();
 		if(loginList.containsKey(userName)){
 			String [] array;
-			array = (String [])bookList.get(userName).keySet().toArray();
+			array = bookList.get(userName).keySet().toArray(new String[0]);
+			System.out.println("La lista de libros leidos es: " + Arrays.toString(array) + "\n");
 			// hay que dar de mas recientes a menos, invertir
 			for (int i = 0; i < array.length / 2; i++) {
 				String temp = array[i];
 				array[i] = array[array.length - 1 - i];
 				array[array.length - 1 - i] = temp;
 			}
+			System.out.println("La lista INVERTIDA de libros leidos es: " + Arrays.toString(array) + "\n");
 			titleList.setTitles(array);
 			titleList.setResult(true);
 
