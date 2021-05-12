@@ -11,6 +11,7 @@ package es.upm.fi.sos;
  */
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -90,6 +91,7 @@ public class UPMSocialReadingSkeleton{
 					if(!(friendList.get(userName).contains(friend))){ //no se alamcenan amigos repetidos
 						System.out.println("addFriend:"+friend+"ahora es amigo de "+userName);
 						friendList.get(userName).add(friend);
+						System.out.println("La nueva lista de amigos es: "+friendList.get(userName).toString());
 						responseParam.setResponse(true);
 						response.set_return(responseParam);
 					}
@@ -243,7 +245,9 @@ public class UPMSocialReadingSkeleton{
 		FriendList friends = new FriendList();
 		String userName = user.getName();
 		if(loginList.containsKey(userName)){
-			String [] friendsArray = (String[]) friendList.get(userName).toArray();
+			System.out.println("El usuario "+userName+" tiene lista de amigos\n");
+			String [] friendsArray = friendList.get(userName).toArray(new String[0]);
+			System.out.println("Lista de amigos de " + userName + " es: " + Arrays.toString(friendsArray) + "\n");
 			friends.setFriends(friendsArray);
 			friends.setResult(true);
 		}
