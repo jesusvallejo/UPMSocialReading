@@ -477,16 +477,22 @@ public class UPMSocialReadingSkeleton{
 			book.setAuthor(Author);
 			book.setTitle(title);
 			book.setCalification(calificacion);
-			if (!bookList.get(userName).containsKey(title)){
+			bookList.get(userName).put(title, book);
+
+			/*if (!bookList.get(userName).containsKey(title)){
 				bookList.get(userName).put(title, book);
 			}
 			else{
 				bookList.get(userName).put(title, book);
-			}
+			}*/
+			System.out.println(	"Libro: " + bookList.get(userName).get(title).getTitle() + 
+								"Author: " + bookList.get(userName).get(title).getAuthor() +
+								"Rating: " + bookList.get(userName).get(title).getCalification());
 			responseParam.setResponse(true);
 			response.set_return(responseParam);
 		}
 		else{
+			System.out.println("Usuario no logueado\n");
 			responseParam.setResponse(false);
 			response.set_return(responseParam);
 		}

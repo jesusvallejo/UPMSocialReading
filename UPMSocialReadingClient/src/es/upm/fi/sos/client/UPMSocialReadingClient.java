@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 import javax.ws.rs.core.NewCookie;
 
@@ -152,7 +153,37 @@ public class UPMSocialReadingClient {
 			e.printStackTrace();
 			return false;
 		}
+	}
 
+	static boolean getMyFriendList(UPMSocialReadingStub client) {
+
+		GetMyFriendList friend_list = new GetMyFriendList();
+		GetMyFriendListResponse r;
+		try {
+			r = client.getMyFriendList(friend_list);
+			System.out.println("La lista de amigos es: " + Arrays.toString(r.get_return().getFriends()));
+			return r.get_return().getResult();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	static boolean addReading(UPMSocialReadingStub client, Book book) {
+
+		AddReading add_reading = new AddReading();
+		add_reading.setArgs0(book);
+		AddReadingResponse r;
+
+		try {
+			r = client.addReading(add_reading);
+			return r.get_return().getResponse();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	static void testPrint(String message, boolean passed) {
@@ -388,8 +419,7 @@ public class UPMSocialReadingClient {
 	static void test7(UPMSocialReadingStub client) {
 		/* Test remove friend */
 		/* Define variables */
-		String user_1 = "FranSus_1";
-		String user_2 = "FranSus_2";
+		String user_1 = "FranSus_1", user_2 = "FranSus_2";
 		boolean status;
 		String pwd;
 		/* 7.1 removeFriend not in friendlist == false */
@@ -440,6 +470,96 @@ public class UPMSocialReadingClient {
 		logout(client);
 	}
 
+	static void test8(UPMSocialReadingStub client) {
+		/* Test getMyFriendList */
+		/* Define variables */
+		String user_1 = "FranSus_1", user_2 = "FranSus_2";
+		boolean status;
+		String pwd;
+		String[] friend_list;
+
+		/* 8.1 getMyFriendList empty list == true */
+		login(client, "admin", "admin");
+		addUser(client, user_1);
+		addUser(client, user_2);
+		pwd = userPwd.get(user_1);
+		logout(client);
+
+		login(client, user_1, pwd);
+		// friend_list = getMyFriendList(client);
+		// status = (!Objects.isNull(friend_list) && friend_list.length == 0);
+		status = getMyFriendList(client);
+		testPrint("8.1 empty friendlist", status);
+
+		/* 8.2 getMyFriendList one friend == true */
+		addFriend(client, user_2);
+		status = getMyFriendList(client);
+		testPrint("8.2 one friend", status);
+
+		/* 8.3 getMyFriendList friend erased == true */
+		removeFriend(client, user_2);
+		status = getMyFriendList(client);
+		testPrint("8.3 removed friends", status);
+
+		/* Cleanup */
+		logout(client);
+		login(client, "admin", "admin");
+		removeUser(client, user_1);
+		removeUser(client, user_2);
+		logout(client);
+	}
+
+	static void test9(UPMSocialReadingStub client) {
+		// TODO: test addReading
+		String user_1 = "FranSus_1";
+		boolean status;
+		String pwd;
+		/* Book setup */
+		Book book = new Book();
+		book.setTitle("Luna de pluton");
+		book.setAuthor("Dross");
+		book.setCalification(10);
+
+		/* 9.1 addReading no logged user == false */
+		login(client, "admin", "admin");
+		addUser(client, user_1);
+		pwd = userPwd.get(user_1);
+		logout(client);
+
+		/* Add reading to user_1 */
+		status = addReading(client, book);
+
+
+		testPrint("9.1 addReading no loggin", !status);
+
+		/* 9.2 addReading properly == true */
+		login(client, user_1, pwd);
+		status = addReading(client, book);
+		testPrint("9.2 addReading properly", status);
+
+		/* 9.3 addReading change parameters == true */
+		book.setTitle("NADA");
+		book.setAuthor("Carmen Laforet");
+		book.setCalification(9);
+		status = addReading(client, book);
+		testPrint("9.3 addReading change book params", status);
+
+		/* Cleanup */
+		logout(client);
+		login(client, "admin", "admin");
+		removeUser(client, user_1);
+		logout(client);
+
+	}
+
+	static void test10(UPMSocialReadingStub client) {
+		// TODO: test getMyReadings
+	}
+
+	static void test11(UPMSocialReadingStub client) {
+		// TODO: test getMyFriendReadings
+	}
+
 	public static void main(String[] args) throws AxisFault, RemoteException {
 		// TODO Auto-generated method stub
 
@@ -455,7 +575,10 @@ public class UPMSocialReadingClient {
 			// test4(client);
 			// test5(client);
 			// test6(client);
-			test7(client);
+			// test7(client);
+			// test8(client);
+			test9(client);
+
 		} catch (AxisFault e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
